@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="My Finances">
+<title>My Finances — Sales & Income</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#000;color:#fff;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0 auto;max-width:720px;padding:25px 17px 90px;background:#000}
+h1{font-size:clamp(29px,7vw,38px);letter-spacing:-1.1px;margin:12px 0 20px}h2{font-size:26px;margin:0 0 25px;letter-spacing:-.5px}
+p{line-height:1.5;color:#aaa}small,.muted{color:#aaa}.eyebrow{font-size:12px;letter-spacing:2px;color:#aaa;text-transform:uppercase}
+.panel{border:1px solid #303030;border-radius:24px;padding:24px 19px;margin:20px 0;background:#000}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pill{background:#202020;color:#ddd;border-radius:30px;padding:6px 12px;font-size:14px;white-space:nowrap}
+.item{padding:14px 0 24px}.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:19px;font-size:16px}
+.item-head label{color:#aaa;flex:1}.value{font-size:19px;font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:7px;background:#252525;border-radius:20px;outline:none;margin:12px 0;touch-action:pan-y}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;background:#fff;width:45px;height:31px;border-radius:18px;box-shadow:0 1px 3px #0005}
+input[type=range]::-moz-range-thumb{background:#fff;border:0;width:45px;height:31px;border-radius:18px}
+hr{border:0;border-top:1px solid #252525;margin:20px 0}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:22px 15px}.metric-label{color:#aaa;font-size:12px;letter-spacing:.3px;text-transform:uppercase}.metric-value{font-size:clamp(21px,5.5vw,30px);font-weight:700;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}button.action{border:1px solid #555;background:#181818;color:white;border-radius:12px;padding:13px 16px;font-weight:600}
+button.action:active,.nav:active{background:#303030}.action.full{width:100%}.ghost{background:none;color:#bbb;border:0;font-size:14px;padding:8px}
+.nav{display:flex;align-items:center;gap:15px;padding:19px 3px;text-decoration:none;color:#fff;border:0;background:none;width:100%;text-align:left}.nav .ico{width:52px;height:52px;border-radius:15px;background:#222;display:grid;place-items:center;font-size:25px;flex-shrink:0}.nav strong{font-size:21px}.nav span{color:#aaa;font-size:13px;line-height:1.45}.chevron{margin-left:auto;color:#aaa;font-size:23px}
+.rep{border-top:1px solid #252525;padding:21px 0 4px}.rep:first-of-type{border-top:0}.rep-title{display:flex;align-items:center;gap:8px;margin-bottom:9px}.rep-title input{flex:1;min-width:0;background:#101010;border:1px solid #333;color:#fff;border-radius:8px;padding:10px;font-size:16px}.rep-meta{font-size:13px;color:#aaa;line-height:1.6}.rep-meta strong{color:#fff}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.toggle input{width:23px;height:23px;accent-color:#fff}
+.hidden{display:none!important}.note{font-size:12px;line-height:1.6;color:#999}.bar{background:#222;border-radius:10px;height:8px;overflow:hidden}.bar>div{background:#fff;height:100%;width:0%}
+footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
+</style></head>
+<body>
+<section id="home">
+<div class="eyebrow">Personal financial planning</div><h1>Your Financial Dashboard</h1>
+<p>One home for your connected calculators and monthly tracking.</p>
+<div class="panel" style="padding:16px 22px">
+<button class="nav" onclick="show('sales')"><div class="ico">☷</div><div><strong>Sales &amp; Income</strong><br><span>Production, reps, overrides, bonuses and residuals</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="coming('Personal Budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Monthly bills and everyday spending</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="coming('Business Expenses')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="coming('Tax Planning')"><div class="ico">▥</div><div><strong>Tax Planning</strong><br><span>S-Corp setup, tax estimates and reserves</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="coming('Homeownership')"><div class="ico">⌂</div><div><strong>Homeownership</strong><br><span>Down payment and purchase timeline</span></div><div class="chevron">›</div></button>
+</div><p class="note">Sales &amp; Income is active. Other categories are placeholders for future modules.</p>
+</section>
+<section id="sales" class="hidden">
+<button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Sales &amp; income · 2027 plan</div><h1>Sales &amp; Income</h1>
+<p>Move a slider. Every connected number updates instantly.</p>
+<div class="panel"><div class="top"><h2>Personal production</h2><span class="pill">2027 plan</span></div>
+<div id="productionSliders"></div><hr>
+<div class="metrics">
+<div><div class="metric-label">Total produced</div><div class="metric-value" id="produced">$385,000</div></div>
+<div><div class="metric-label">Projected active</div><div class="metric-value" id="active">$340,340</div></div>
+<div><div class="metric-label">Commission tier</div><div class="metric-value" id="tier">66%</div></div>
+<div><div class="metric-label">Base commission</div><div class="metric-value" id="base">$224,624</div></div>
+</div><p class="note">Active Retention uses your historical adjusted revenue ratio. The commission tier is selected from active revenue, not produced revenue.</p>
+</div>
+<div class="panel"><h2>Bonuses &amp; personal income</h2><div id="bonusSliders"></div>
+<label class="toggle"><span>Include EMB bonus in total</span><input id="embOn" type="checkbox" checked onchange="update()"></label><hr>
+<div class="metrics">
+<div><div class="metric-label">Base commission</div><div class="metric-value" id="base2">$0</div></div>
+<div><div class="metric-label">Multi-year advance estimate</div><div class="metric-value" id="multi">$0</div></div>
+<div><div class="metric-label">Year-one residual estimate</div><div class="metric-value" id="resid">$0</div></div>
+<div><div class="metric-label">EMB bonus</div><div class="metric-value" id="embResult">$0</div></div>
+</div><hr><div class="metric-label">Personal projected compensation</div><div class="metric-value" id="personal">$0</div>
+<p class="note">Multi-year $20 advances are treated as part of compensation, not added twice to the same payment. The residual estimate is modeled separately using the earlier 7.2% assumption × 85% retention; confirm whether it overlaps with any other residual category before treating this as actual income. EMB is fully adjustable and separate.</p>
+</div>
+<div class="panel"><div class="top"><h2>Your downline</h2><span class="pill" id="repCount">2 reps</span></div>
+<p>Each rep has their own active revenue slider. Your two experienced directs start at $200,000 each.</p><div id="reps"></div>
+<button class="action full" onclick="addRep()">+ Add Another Rep</button><hr>
+<div class="metrics">
+<div><div class="metric-label">Downline active</div><div class="metric-value" id="team">$0</div></div>
+<div><div class="metric-label">Management tier</div><div class="metric-value" id="manager">—</div></div>
+<div><div class="metric-label">Direct rep overrides</div><div class="metric-value" id="overrides">$0</div></div>
+<div><div class="metric-label">High-producer guarantees</div><div class="metric-value" id="guarantees">$0</div></div>
+</div><p class="note" id="nextTier"></p>
+<p class="note">Management qualification excludes your personal sales. Each rep's own tier is calculated separately. A $5,000 guarantee is modeled when the rep's commission rate exceeds yours; no override is added for that rep. Equal-rate treatment and other eligibility rules still need confirmation.</p>
+</div>
+<div class="panel"><h2>Combined earnings</h2><div class="metrics">
+<div><div class="metric-label">Personal</div><div class="metric-value" id="sumPersonal">$0</div></div>
+<div><div class="metric-label">Management</div><div class="metric-value" id="sumManagement">$0</div></div>
+</div><hr><div class="metric-label">Estimated gross compensation</div><div class="metric-value" id="grand" style="font-size:38px">$0</div>
+<p class="note">Planning estimate before tax, business expenses, cancellations, actual payment timing, and future-year residuals. Not a mortgage-qualifying income calculation.</p>
+<button class="action full" onclick="exportCSV()">Export summary CSV</button>
+</div>
+<button class="action full" onclick="resetAll()">Reset to starting assumptions</button>
+</section>
+<footer>Saved automatically on this device when opened in a browser that supports local storage. Local file previews may show the numbers but disable interactivity. For reliable iPhone Home Screen use, publish this file to an HTTPS static host and open it in Safari.</footer>
+<script>
+const personalTiers=[[85000,40],[105000,42],[130000,45],[150000,50],[170000,53],[190000,56],[215000,58],[230000,60],[250000,62],[300000,64],[340000,66],[385000,68],[425000,70],[552500,75],[850000,80]];
+const managerTiers=[[700000,52,"Team Leader"],[1200000,58,"Senior Team Leader"],[2400000,63,"Senior Team Leader"],[3600000,66,"Divisional"],[6000000,68,"Senior Divisional"],[8400000,70,"Regional"]];
+const defaults={weekly:30000,weeks:12,pre:25000,retention:88.4,multiShare:100,residualRetention:85,emb:10000,embOn:true,reps:[{id:1,name:"Experienced Rep 1",active:200000},{id:2,name:"Experienced Rep 2",active:200000}]};
+let s;try{s={...structuredClone(defaults),...JSON.parse(localStorage.getItem('financeSales2027')||'{}')}}catch(e){s=JSON.parse(JSON.stringify(defaults))}
+let nextId=Math.max(2,...s.reps.map(r=>r.id))+1;
+const $=id=>document.getElementById(id), money=n=>'$'+Math.round(n).toLocaleString('en-US');
+const getTier=n=>{let p=40;for(const [min,pct] of personalTiers)if(n>=min)p=pct;return p};
+const getMgr=n=>{let found=null;for(const [min,pct,name] of managerTiers)if(n>=min)found={min,pct,name};return found};
+function save(){try{localStorage.setItem('financeSales2027',JSON.stringify(s))}catch(e){}}
+function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');window.scrollTo(0,0);location.hash=which==='sales'?'sales':''}
+function coming(name){alert(name+' is planned for a future update. Sales & Income is ready now.')}
+function sliderMarkup(id,label,min,max,step,value){return `<div class="item"><div class="item-head"><label for="${id}">${label}</label><span class="value" id="${id}Val">${money(value)}</span></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="sliderChange('${id}',this.value)"></div>`}
+function drawSliders(){
+$('productionSliders').innerHTML=sliderMarkup('weekly','Weekly',10000,50000,1000,s.weekly)+sliderMarkup('monthly','Monthly production (4-week equivalent)',40000,200000,4000,s.weekly*4)+sliderMarkup('season','Summer season production',s.weeks*10000,s.weeks*50000,s.weeks*1000,s.weekly*s.weeks)+sliderMarkup('weeks','Selling weeks',10,18,1,s.weeks)+sliderMarkup('pre','Preseason production',0,60000,5000,s.pre)+sliderMarkup('retention','Active Retention',75,100,.1,s.retention);
+$('bonusSliders').innerHTML=sliderMarkup('multiShare','Multi-year qualifying share',0,100,5,s.multiShare)+sliderMarkup('residualRetention','Year-one residual retention',0,100,5,s.residualRetention)+sliderMarkup('emb','EMB bonus',0,20000,1000,s.emb);
+$('embOn').checked=s.embOn;
+}
+function sliderChange(id,v){
+v=Number(v);
+if(id.startsWith('rep')){let rep=s.reps.find(r=>r.id===Number(id.slice(3)));if(rep)rep.active=v;update();return;}
+if(['weekly','monthly','season'].includes(id))s.weekly=id==='weekly'?v:id==='monthly'?v/4:v/s.weeks;
+else s[id]=v;
+update();
+}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function drawReps(){
+$('repCount').textContent=s.reps.length+' reps';
+$('reps').innerHTML=s.reps.map(r=>`<div class="rep"><div class="rep-title"><input aria-label="Rep name" value="${safe(r.name)}" oninput="renameRep(${r.id},this.value)"><button class="ghost" onclick="removeRep(${r.id})" aria-label="Remove rep">Remove</button></div>${sliderMarkup('rep'+r.id,'Active revenue',0,400000,5000,r.active)}<div class="rep-meta" id="repMeta${r.id}"></div></div>`).join('');
+}
+function renameRep(id,name){let r=s.reps.find(x=>x.id===id);if(r){r.name=name;save()}}
+function removeRep(id){s.reps=s.reps.filter(r=>r.id!==id);drawReps();update()}
+function addRep(){s.reps.push({id:nextId++,name:'Rep '+(s.reps.length+1),active:100000});drawReps();update()}
+function update(){
+let season=s.weekly*s.weeks, produced=season+s.pre,active=produced*s.retention/100,pct=getTier(active),base=active*pct/100;
+let multi=active*.02*s.multiShare/100,resid=active*.072*s.residualRetention/100,emb=s.embOn?s.emb:0,personal=base+multi+resid+emb;
+let team=s.reps.reduce((a,r)=>a+r.active,0),mgr=getMgr(team),overrides=0,guarantees=0;
+for(const r of s.reps){const rp=getTier(r.active);let override=0,guarantee=0;if(mgr){if(rp>mgr.pct)guarantee=5000;else if(rp<mgr.pct)override=r.active*(mgr.pct-rp)/100;}overrides+=override;guarantees+=guarantee;
+let meta=$('repMeta'+r.id);if(meta)meta.innerHTML=`Rep tier: <strong>${rp}%</strong> · Override: <strong>${money(override)}</strong> · Guarantee: <strong>${money(guarantee)}</strong>`;
+}
+let mapping={produced:money(produced),active:money(active),tier:pct+'%',base:money(base),base2:money(base),multi:money(multi),resid:money(resid),embResult:money(emb),personal:money(personal),team:money(team),manager:mgr?mgr.pct+'%':'—',overrides:money(overrides),guarantees:money(guarantees),sumPersonal:money(personal),sumManagement:money(overrides+guarantees),grand:money(personal+overrides+guarantees)};
+for(const [id,val] of Object.entries(mapping))$(id).textContent=val;
+let next=managerTiers.find(t=>team<t[0]);$('nextTier').textContent=(mgr?mgr.name+' · '+mgr.pct+'%. ':'Below Team Leader tier. ')+(next?money(next[0]-team)+' to next management tier.':'Highest listed management tier reached.');
+for(const [id,value] of Object.entries({weekly:s.weekly,monthly:s.weekly*4,season, weeks:s.weeks,pre:s.pre,retention:s.retention,multiShare:s.multiShare,residualRetention:s.residualRetention,emb:s.emb})){
+let el=$(id),label=$(id+'Val');if(el){if(id==='season'){el.min=s.weeks*10000;el.max=s.weeks*50000;el.step=s.weeks*1000}el.value=value}if(label)label.textContent=id==='weeks'?value:id==='retention'||id==='multiShare'||id==='residualRetention'?value+'%':money(value);
+}
+$('embOn').checked=s.embOn;
+for(const r of s.reps){let el=$('rep'+r.id),val=$('rep'+r.id+'Val');if(el)el.value=r.active;if(val)val.textContent=money(r.active)}
+save();
+}
+function resetAll(){if(!confirm('Reset sales assumptions and reps?'))return;s=JSON.parse(JSON.stringify(defaults));nextId=3;drawSliders();drawReps();update()}
+function exportCSV(){let active=(s.weekly*s.weeks+s.pre)*s.retention/100;let rows=[['Metric','Value'],['Weekly',s.weekly],['Weeks',s.weeks],['Preseason',s.pre],['Active retention',s.retention],['Active revenue',active],['Commission tier',getTier(active)],['EMB',s.embOn?s.emb:0],...s.reps.map(r=>['Rep: '+r.name,r.active]),['Projected combined gross',$('grand').textContent]];let blob=new Blob([rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-income-2027.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+drawSliders();drawReps();for(const r of s.reps){let el=$('rep'+r.id);if(el)el.oninput=e=>{r.active=+e.target.value;update()}};document.querySelectorAll('#reps input[type=range]').forEach(el=>el.oninput=e=>{let id=+el.id.slice(3);let r=s.reps.find(x=>x.id===id);if(r){r.active=+e.target.value;update()}});$('embOn').onchange=e=>{s.embOn=e.target.checked;update()};update();if(location.hash==='#sales')show('sales');
+const oldAdd=addRep;addRep=function(){oldAdd();document.querySelectorAll('#reps input[type=range]').forEach(el=>el.oninput=e=>{let r=s.reps.find(x=>x.id===+el.id.slice(3));if(r){r.active=+e.target.value;update()}})};
+</script></body></html>
