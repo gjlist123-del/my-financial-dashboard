@@ -156,7 +156,7 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <label for="actualSavings" class="metric-label">Actual savings account balance</label>
 <input class="field" id="actualSavings" type="number" min="0" step="100" onchange="setBankSavings(this.value)" style="font-size:27px;font-weight:700;margin:12px 0">
 <p class="note">Virtual allocations are labels for your money, not transfers. Do not count the same money in more than one bucket.</p>
-<div class="alloc-bar"><div id="segProtected" style="background:#d3ad4f"></div><div id="segLiving" style="background:#888"></div><div id="segHome" style="background:#43876a"></div></div>
+<div class="alloc-bar"><div id="segTax" style="background:#d3ad4f"></div><div id="segEmergency" style="background:#6f9dc4"></div><div id="segCommitments" style="background:#b18acb"></div><div id="segLiving" style="background:#8b929c"></div><div id="segHome" style="background:#43876a"></div></div>
 <div id="allocationSliders"></div>
 <hr><div class="metrics">
 <div><div class="metric-label">Protected reserves</div><div class="metric-value" id="protectedResult">$0</div></div>
@@ -268,8 +268,10 @@ if(name==='cash'||name==='savings')renderPlan();
 }
 const flexNames={groceries:'Groceries',dining:'Eating out',transport:'Transportation',entertainment:'Entertainment',child:'Child activities & extras',other:'Other flexible spending'};
 const allocNames={tax:'Tax reserve',emergency:'Emergency reserve',commitments:'Other commitments',living:'Off-season living fund',home:'Home savings'};
-function planSlider(key,label,val,max,fn){
-return `<div class="item"><div class="item-head"><label>${label}</label><span class="value">${money(val)}</span></div><input type="range" min="0" max="${max}" step="50" value="${val}" onchange="${fn}('${key}',this.value)"></div>`;
+function planSlider(key,label,val,max,fn,editable=false){
+const color=editable?{tax:'#d3ad4f',emergency:'#6f9dc4',commitments:'#b18acb',living:'#8b929c',home:'#43876a'}[key]:null;
+const value=editable?`<input aria-label="${label} amount" type="number" min="0" step="1" value="${val}" class="field" style="width:120px;padding:9px;text-align:right" onchange="${fn}('${key}',this.value)">`:`<span class="value">${money(val)}</span>`;
+return `<div class="item"><div class="item-head"><label>${color?`<span style="display:inline-block;background:${color};width:10px;height:10px;border-radius:3px;margin-right:8px"></span>`:''}${label}</label>${value}</div><input aria-label="${label} slider" type="range" min="0" max="${max}" step="${editable?100:50}" value="${Math.min(val,max)}" onchange="${fn}('${key}',this.value)"></div>`;
 }
 function setFlex(key,v){plan.flex[key]=Math.max(0,+v||0);savePlan();renderPlan()}
 function setAllocation(key,v){plan.alloc[key]=Math.max(0,+v||0);savePlan();renderPlan()}
@@ -288,13 +290,13 @@ $('actualSavings').value=plan.bank;
 $('cashStartLabel').textContent=money(plan.bank);
 $('flexTotal').textContent=money(flex);
 $('flexSliders').innerHTML=Object.entries(flexNames).map(([k,label])=>planSlider(k,label,plan.flex[k],2500,'setFlex')).join('');
-$('allocationSliders').innerHTML=Object.entries(allocNames).map(([k,label])=>planSlider(k,label,plan.alloc[k],100000,'setAllocation')).join('');
+$('allocationSliders').innerHTML=Object.entries(allocNames).map(([k,label])=>planSlider(k,label,plan.alloc[k],Math.max(10000,Math.ceil(plan.bank/1000)*1000),'setAllocation',true)).join('');
 $('protectedResult').textContent=money(plan.alloc.tax+plan.alloc.emergency+plan.alloc.commitments);
 $('livingResult').textContent=money(plan.alloc.living);
 $('homeResult').textContent=money(plan.alloc.home);
 $('unallocatedResult').textContent=money(remaining);
 $('allocationWarning').textContent=remaining<0?'Your allocations exceed your real savings by '+money(-remaining)+'. Reduce one or more buckets.':'Virtual allocations are saved locally. Tax reserve is a placeholder until Tax Planning is built.';
-for(const [id,k] of [['segProtected',plan.alloc.tax+plan.alloc.emergency+plan.alloc.commitments],['segLiving',plan.alloc.living],['segHome',plan.alloc.home]])$(id).style.width=(plan.bank>0?Math.max(0,Math.min(100,k/plan.bank*100)):0)+'%';
+for(const [id,k] of [['segTax',plan.alloc.tax],['segEmergency',plan.alloc.emergency],['segCommitments',plan.alloc.commitments],['segLiving',plan.alloc.living],['segHome',plan.alloc.home]])$(id).style.width=(plan.bank>0?Math.max(0,k/Math.max(plan.bank,alloc)*100):0)+'%';
 const baseline=monthlyBillsFor(10)+flex;
 $('monthlyBaseline').textContent=money(baseline);
 $('runway').textContent=baseline>0?(plan.alloc.living/baseline).toFixed(1)+' months':'—';
