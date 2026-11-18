@@ -49,6 +49,18 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 .cash-table-wrap{overflow-x:auto}
 .alloc-bar{display:flex;height:12px;border-radius:20px;overflow:hidden;background:#222;gap:2px}
 .alloc-bar div{transition:width .15s}
+
+.be-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.be-action{border:1px solid #333;background:#000;color:#fff;border-radius:20px;min-height:136px;padding:19px 10px;text-align:center}
+.be-action .symbol{display:block;font-size:30px;margin-bottom:12px}.be-action strong{display:block;font-size:17px}.be-action small{display:block;margin-top:9px;font-size:12px}
+.be-cats{display:grid;gap:4px}.be-cat{background:transparent;color:#fff;border:0;border-bottom:1px solid #222;display:flex;align-items:center;text-align:left;gap:14px;padding:17px 3px}
+.be-cat .symbol{background:#222;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.be-cat strong{font-size:16px}.be-cat small{display:block;color:#999;font-size:12px;margin-top:4px;line-height:1.5}
+.be-form label{font-size:13px;color:#aaa;display:block;margin:13px 0 6px}.be-form input,.be-form select,.be-form textarea{width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:12px;padding:13px;font-size:16px}
+.be-form textarea{min-height:76px}.be-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.be-row{border-bottom:1px solid #282828;padding:14px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.be-row small{display:block;color:#999;margin-top:5px;line-height:1.4}
+.be-row .ghost{padding:5px}.be-toolbar{display:flex;gap:9px;margin:12px 0}.be-toolbar select{min-width:0;flex:1}
 </style></head>
 <body>
 <section id="home">
@@ -57,10 +69,10 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <div class="panel" style="padding:16px 22px">
 <button class="nav" onclick="show('sales')"><div class="ico">☷</div><div><strong>Sales &amp; Income</strong><br><span>Production, reps, overrides, bonuses and residuals</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="show('budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Bills, seasonal cash flow and savings</span></div><div class="chevron">›</div></button>
-<button class="nav" onclick="coming('Business Expenses')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="show('business')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Tax Planning')"><div class="ico">▥</div><div><strong>Tax Planning</strong><br><span>S-Corp setup, tax estimates and reserves</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Homeownership')"><div class="ico">⌂</div><div><strong>Homeownership</strong><br><span>Down payment and purchase timeline</span></div><div class="chevron">›</div></button>
-</div><p class="note">Sales &amp; Income and Personal Budget are active. Other categories are coming soon.</p>
+</div><p class="note">Sales &amp; Income, Personal Budget and Business Expenses are active. Tax Planning and Homeownership are coming soon.</p>
 </section>
 <section id="sales" class="hidden">
 <button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Sales &amp; income · 2027 plan</div><h1>Sales &amp; Income</h1>
@@ -172,6 +184,60 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <button class="action full" onclick="exportBudgetPlan()">Export budget plan backup (JSON)</button>
 </div>
 </section>
+
+<section id="business" class="hidden">
+<button class="ghost" onclick="show('home')">‹ Dashboard</button>
+<div class="eyebrow">Financial dashboard</div><h1>Business Expenses</h1>
+<div class="metrics panel">
+<div><div class="metric-label">Expenses recorded</div><div class="metric-value" id="beTotal">$0</div><small id="beCount">0 entries</small></div>
+<div><div class="metric-label">Needs review</div><div class="metric-value" id="beReview">0</div><small>Tax category or receipt</small></div>
+</div>
+<div class="be-actions">
+<button class="be-action" onclick="beOpen('receipt')"><span class="symbol">▣</span><strong>Scan Receipt</strong><small>Capture, review, save</small></button>
+<button class="be-action" onclick="beOpen('expense')"><span class="symbol">⊕</span><strong>Add Expense</strong><small>Quick manual entry</small></button>
+<button class="be-action" onclick="beOpen('mileage')"><span class="symbol">🚘</span><strong>Log Mileage</strong><small>Trips and business purpose</small></button>
+<button class="be-action" onclick="beOpen('equipment')"><span class="symbol">▱</span><strong>Equipment Planner</strong><small>Purchases and scenarios</small></button>
+</div>
+<div id="beFormPanel" class="panel hidden">
+<div class="top"><h2 id="beFormTitle" style="margin:0">New Expense</h2><button class="ghost" onclick="beClose()">Close ✕</button></div>
+<div id="beExpenseForm" class="be-form">
+<label for="beReceipt">Scan or Upload Receipt</label>
+<label style="display:block;background:#222;border-radius:18px;text-align:center;padding:24px 12px;color:white;cursor:pointer" for="beReceipt"><span style="font-size:29px">▣</span><br><strong>Take Photo or Choose Image</strong><br><small>Manual entry now; automated extraction comes with private cloud version</small></label>
+<input type="file" id="beReceipt" accept="image/*,application/pdf" onchange="beFileChanged(this)" style="margin-top:10px">
+<p id="beReceiptNote" class="note">Receipts are not uploaded or saved in this version. Keep the original in your private files.</p>
+<div class="be-cols"><div><label for="beDate">Date</label><input type="date" id="beDate"></div><div><label for="beAmount">Amount YOU paid ($)</label><input type="number" min="0" step=".01" id="beAmount" placeholder="0.00"></div></div>
+<label for="beMerchant">Merchant / Event</label><input id="beMerchant" placeholder="College Billiards">
+<label for="beCategory">Expense Category</label><select id="beCategory"></select>
+<label for="bePurpose">Business Purpose</label><textarea id="bePurpose" placeholder="Recruiting prospects, customer acquisition, field training..."></textarea>
+<div class="be-cols"><div><label for="bePayment">Payment source</label><select id="bePayment"><option>Personal funds</option><option>Business account</option><option>Sigma deduction</option><option>Other</option></select></div><div><label for="beStatus">Tax review</label><select id="beStatus"><option>Needs review</option><option>Potentially deductible</option><option>Partially deductible</option><option>Nondeductible</option><option>Reviewed by accountant</option></select></div></div>
+<div class="be-cols"><div><label for="beEvent">Event type</label><select id="beEvent"><option value="">Not applicable</option><option>Recruiting</option><option>Team development</option><option>Team reward</option><option>Customer acquisition</option></select></div><div><label for="beReference">Reference (optional)</label><input id="beReference" placeholder="Event or sale ID"></div></div>
+<label for="beReimbursed">Reimbursed amount ($)</label><input id="beReimbursed" type="number" min="0" step=".01" value="0">
+<p class="note">For customer cancellation assistance, record only what you personally paid. Avoid entering customer names or account numbers. Confirm company policy before offering incentives.</p>
+<button class="action full" onclick="beSaveExpense()" style="margin-top:15px">Save Expense</button>
+</div>
+<div id="beMileageForm" class="be-form hidden">
+<div class="be-cols"><div><label for="beMDate">Date</label><input id="beMDate" type="date"></div><div><label for="beMiles">Business miles</label><input id="beMiles" type="number" min="0" step=".1" placeholder="0"></div></div>
+<label for="beRoute">Route / destinations</label><input id="beRoute" placeholder="Office → recruiting event → office">
+<label for="beMPurpose">Business purpose</label><textarea id="beMPurpose" placeholder="Meeting with prospective representatives"></textarea>
+<p class="note">Log qualifying business mileage only, not ordinary commuting. Rates and deductibility will be verified in Tax Planning; this log does not calculate a tax deduction.</p>
+<button class="action full" onclick="beSaveMileage()">Save Trip</button>
+</div>
+</div>
+<div class="panel"><h2>Expense categories</h2><div class="be-cats" id="beCategories"></div></div>
+<div class="panel"><div class="top"><h2 style="margin:0">Expense Ledger</h2><span class="pill" id="beLedgerCount">0 entries</span></div>
+<div class="be-toolbar"><select class="field" id="beFilter" onchange="beRender()"><option value="">All categories</option></select><select class="field" id="beYear" onchange="beRender()"></select></div>
+<div id="beLedger"></div>
+<button class="action full" onclick="beExport()" style="margin-top:15px">Export Expenses &amp; Mileage (CSV)</button>
+</div>
+<div class="panel"><h2>Mileage Log</h2><div id="beMileageList"></div></div>
+<div class="panel"><h2>Equipment Planner</h2><p class="note">Use Add Expense → Technology &amp; Equipment for purchased items, or record a planned purchase here. Planned purchases do not count as actual expenses.</p>
+<div class="be-form"><label for="beEquipName">Planned item</label><input id="beEquipName" placeholder="Laptop or iPad">
+<div class="be-cols"><div><label for="beEquipCost">Estimated price ($)</label><input id="beEquipCost" type="number" min="0" step="1"></div><div><label for="beEquipUse">Business use (%)</label><input id="beEquipUse" type="number" min="0" max="100" value="100"></div></div>
+<button class="action full" onclick="beSaveEquipment()" style="margin-top:14px">Add Planned Purchase</button></div>
+<div id="beEquipmentList"></div><p class="note">Business-use estimates are planning inputs, not automatic deductions. Tax treatment depends on substantiation, ownership, and applicable rules.</p></div>
+<div class="panel"><h2>Sigma Commission Deductions</h2><p class="note">When housing is withheld from commissions, record it as a Sigma deduction. Do not enter it again as a personal bank expense. Reconcile gross commission, withholding, and net deposit using your Sigma statements.</p><div id="beSigmaSummary"></div></div>
+<p class="note">Privacy: records in this version are stored locally in this browser, not synced or encrypted as a financial service. Do not put receipts or private financial exports into a public GitHub repository. Back up your records regularly.</p>
+</section>
 <footer>Saved automatically on this device when opened in a browser that supports local storage. Local file previews may show the numbers but disable interactivity. For reliable iPhone Home Screen use, publish this file to an HTTPS static host and open it in Safari.</footer>
 <script>
 const personalTiers=[[85000,40],[105000,42],[130000,45],[150000,50],[170000,53],[190000,56],[215000,58],[230000,60],[250000,62],[300000,64],[340000,66],[385000,68],[425000,70],[552500,75],[850000,80]];
@@ -183,7 +249,7 @@ const $=id=>document.getElementById(id), money=n=>'$'+Math.round(n).toLocaleStri
 const getTier=n=>{let p=40;for(const [min,pct] of personalTiers)if(n>=min)p=pct;return p};
 const getMgr=n=>{let found=null;for(const [min,pct,name] of managerTiers)if(n>=min)found={min,pct,name};return found};
 function save(){try{localStorage.setItem('financeSales2027',JSON.stringify(s))}catch(e){}}
-function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');$('budget').classList.toggle('hidden',which!=='budget');window.scrollTo(0,0);location.hash=which==='home'?'':which}
+function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');$('budget').classList.toggle('hidden',which!=='budget');$('business').classList.toggle('hidden',which!=='business');window.scrollTo(0,0);location.hash=which==='home'?'':which}
 function coming(name){alert(name+' is planned for a future update. Sales & Income is ready now.')}
 function sliderMarkup(id,label,min,max,step,value){return `<div class="item"><div class="item-head"><label for="${id}">${label}</label><span class="value" id="${id}Val">${money(value)}</span></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="sliderChange('${id}',this.value)"></div>`}
 function drawSliders(){
@@ -324,4 +390,88 @@ a.href=URL.createObjectURL(blob);a.download='financial-dashboard-backup.json';a.
 }
 renderPlan();
 
+
+const beCategories=[
+['Recruiting & Team Events','Bowling, billiards, mini golf, waterparks','♧'],
+['Meals & Hospitality','Team meals and prospect meetings','♨'],
+['Housing & Travel','Seasonal rent, hotels and travel','⌂'],
+['Mileage & Vehicle','Business drives, parking and tolls','🚘'],
+['Technology & Equipment','AirPods, laptop, iPad and accessories','▱'],
+['Operations & Subscriptions','Software, supplies and accounting','▤'],
+['Customer Incentives & Acquisition','Cancellation assistance and promotional gifts','♢']
+];
+const beKey='financeBusinessExpensesV1';
+let be;try{be=JSON.parse(localStorage.getItem(beKey)||'null')}catch(e){}
+if(!be||!Array.isArray(be.expenses))be={expenses:[],mileage:[],equipment:[]};
+be.mileage??=[];be.equipment??=[];
+let beEditing=null;
+const beToday=()=>new Date().toLocaleDateString('en-CA');
+const beId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function bePersist(){try{localStorage.setItem(beKey,JSON.stringify(be))}catch(e){alert('Could not save. Browser storage may be full. Export your data.');}}
+function beOpen(kind,category='',id=null){
+$('beFormPanel').classList.remove('hidden');
+$('beExpenseForm').classList.toggle('hidden',kind==='mileage');
+$('beMileageForm').classList.toggle('hidden',kind!=='mileage');
+$('beFormTitle').textContent=kind==='mileage'?'Log Business Mileage':id?'Edit Expense':'New Expense';
+beEditing=id;
+if(kind==='mileage'){$('beMDate').value=beToday();$('beMiles').value='';$('beRoute').value='';$('beMPurpose').value=''}
+else{
+const e=be.expenses.find(x=>x.id===id);
+$('beDate').value=e?.date||beToday();$('beAmount').value=e?.amount??'';$('beMerchant').value=e?.merchant||'';
+$('beCategory').value=e?.category||category||beCategories[0][0];
+$('bePurpose').value=e?.purpose||'';$('bePayment').value=e?.payment||'Personal funds';
+$('beStatus').value=e?.status||'Needs review';$('beEvent').value=e?.event||'';
+$('beReference').value=e?.reference||'';$('beReimbursed').value=e?.reimbursed??0;
+$('beReceipt').value='';$('beReceiptNote').textContent='Receipts are not uploaded or saved in this version. Keep the original in your private files.';
+}
+$('beFormPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function beClose(){$('beFormPanel').classList.add('hidden');beEditing=null}
+function beFileChanged(el){const f=el.files?.[0];$('beReceiptNote').textContent=f?`Selected: ${f.name}. This file is NOT saved or scanned. Keep the original privately.`:'No file selected.'}
+function beSaveExpense(){
+const amount=+$('beAmount').value,reimbursed=+$('beReimbursed').value||0;
+if(!$('beMerchant').value.trim()||!$('beDate').value||!Number.isFinite(amount)||amount<=0||reimbursed<0||reimbursed>amount){alert('Enter a merchant, date, positive amount, and valid reimbursement.');return}
+const entry={id:beEditing||beId(),date:$('beDate').value,amount,merchant:$('beMerchant').value.trim(),category:$('beCategory').value,purpose:$('bePurpose').value.trim(),payment:$('bePayment').value,status:$('beStatus').value,event:$('beEvent').value,reference:$('beReference').value.trim(),reimbursed};
+if(beEditing)be.expenses=be.expenses.map(e=>e.id===beEditing?entry:e);else be.expenses.push(entry);
+bePersist();beClose();beRender();
+}
+function beSaveMileage(){
+const miles=+$('beMiles').value;
+if(!$('beMDate').value||!Number.isFinite(miles)||miles<=0||!$('beMPurpose').value.trim()){alert('Enter a date, miles and business purpose.');return}
+be.mileage.push({id:beId(),date:$('beMDate').value,miles,route:$('beRoute').value.trim(),purpose:$('beMPurpose').value.trim()});
+bePersist();beClose();beRender();
+}
+function beSaveEquipment(){
+const name=$('beEquipName').value.trim(),cost=+$('beEquipCost').value,use=+$('beEquipUse').value;
+if(!name||!Number.isFinite(cost)||cost<=0||!Number.isFinite(use)||use<0||use>100){alert('Enter an item, positive cost, and business-use percentage from 0 to 100.');return}
+be.equipment.push({id:beId(),name,cost,use});$('beEquipName').value='';$('beEquipCost').value='';bePersist();beRender();
+}
+function beRemove(type,id){if(!confirm('Delete this entry?'))return;be[type]=be[type].filter(x=>x.id!==id);bePersist();beRender()}
+function beRender(){
+const yr=$('beYear').value||String(new Date().getFullYear()),filter=$('beFilter').value;
+const current=be.expenses.filter(e=>e.date.startsWith(yr)),shown=current.filter(e=>!filter||e.category===filter);
+const total=current.reduce((s,e)=>s+e.amount,0),review=current.filter(e=>e.status==='Needs review').length;
+$('beTotal').textContent=money(total);$('beCount').textContent=current.length+' entries in '+yr;$('beReview').textContent=review;
+$('beLedgerCount').textContent=shown.length+' entries';
+$('beLedger').innerHTML=shown.length?shown.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>`<div class="be-row"><div style="flex:1"><strong>${safe(e.merchant)}</strong><small>${safe(e.date)} · ${safe(e.category)}<br>${safe(e.payment)} · ${safe(e.status)}${e.reimbursed?' · Reimbursed '+money(e.reimbursed):''}${e.purpose?'<br>'+safe(e.purpose):''}</small></div><div style="text-align:right"><strong>${money(e.amount)}</strong><br><button class="ghost" onclick="beOpen('expense','', '${e.id}')">Edit</button><button class="ghost" onclick="beRemove('expenses','${e.id}')">✕</button></div></div>`).join(''):'<p class="note">No expenses recorded for this selection. Add your first expense above.</p>';
+const miles=be.mileage.filter(e=>e.date.startsWith(yr));
+$('beMileageList').innerHTML=miles.length?miles.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>`<div class="be-row"><div><strong>${e.miles.toLocaleString()} miles</strong><small>${safe(e.date)} · ${safe(e.route)}<br>${safe(e.purpose)}</small></div><button class="ghost" onclick="beRemove('mileage','${e.id}')">Remove</button></div>`).join(''):'<p class="note">No trips logged for '+yr+'.</p>';
+$('beEquipmentList').innerHTML=be.equipment.length?be.equipment.map(e=>`<div class="be-row"><div><strong>${safe(e.name)}</strong><small>${e.use}% expected business use · Planned only</small></div><div><strong>${money(e.cost)}</strong><button class="ghost" onclick="beRemove('equipment','${e.id}')">✕</button></div></div>`).join(''):'<p class="note">No planned purchases yet.</p>';
+const sigma=current.filter(e=>e.payment==='Sigma deduction');
+$('beSigmaSummary').innerHTML=`<div class="line"><span>Sigma deductions logged (${yr})</span><strong>${money(sigma.reduce((s,e)=>s+e.amount,0))}</strong></div><p class="note">${sigma.length} records. These are tracked separately from personal bank outflows.</p>`;
+}
+function beExport(){
+const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';
+const rows=[['Record type','Date','Merchant/route','Amount/miles','Category','Purpose','Payment','Tax status','Event','Reference','Reimbursed']];
+be.expenses.forEach(e=>rows.push(['Expense',e.date,e.merchant,e.amount,e.category,e.purpose,e.payment,e.status,e.event,e.reference,e.reimbursed]));
+be.mileage.forEach(e=>rows.push(['Mileage',e.date,e.route,e.miles,'Mileage',e.purpose,'','','','','']));
+be.equipment.forEach(e=>rows.push(['Planned purchase','',e.name,e.cost,'Equipment',e.use+'% business use','','','','','']));
+const blob=new Blob([rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
+a.href=URL.createObjectURL(blob);a.download='business-expenses-export.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$('beCategories').innerHTML=beCategories.map(([name,desc,icon])=>`<button class="be-cat" onclick="beOpen('expense', '${name}')"><span class="symbol">${icon}</span><span style="flex:1"><strong>${name}</strong><small>${desc}</small></span><span style="color:#999;font-size:22px">›</span></button>`).join('');
+$('beCategory').innerHTML=beCategories.map(([name])=>`<option>${name}</option>`).join('');
+$('beFilter').innerHTML='<option value="">All categories</option>'+beCategories.map(([name])=>`<option>${name}</option>`).join('');
+$('beYear').innerHTML=[2026,2027,2028,2029,2030].map(y=>`<option value="${y}" ${y===new Date().getFullYear()?'selected':''}>${y}</option>`).join('');
+beRender();
 </script></body></html>
