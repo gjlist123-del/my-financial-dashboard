@@ -61,6 +61,17 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 .be-row{border-bottom:1px solid #282828;padding:14px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .be-row small{display:block;color:#999;margin-top:5px;line-height:1.4}
 .be-row .ghost{padding:5px}.be-toolbar{display:flex;gap:9px;margin:12px 0}.be-toolbar select{min-width:0;flex:1}
+
+/* V6 mobile form and monochrome icon refinements */
+.be-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.be-cols>div{min-width:0}
+.be-form input,.be-form select,.be-form textarea{box-sizing:border-box;min-width:0;max-width:100%}
+.be-form input[type=date]{-webkit-appearance:none;appearance:none;font-size:16px;min-height:51px;padding:12px 8px}
+.be-form input[type=number]{font-size:16px;min-height:51px}
+.be-action .symbol,.be-cat .symbol{color:#fff}
+.be-icon{display:inline-block;width:29px;height:29px;vertical-align:middle;color:#fff}
+.be-icon svg{display:block;width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:480px){.be-date-amount{grid-template-columns:minmax(0,1fr)}.be-date-amount input{width:100%}.be-date-amount>div{width:100%}}
 </style></head>
 <body>
 <section id="home">
@@ -193,19 +204,19 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <div><div class="metric-label">Needs review</div><div class="metric-value" id="beReview">0</div><small>Tax category or receipt</small></div>
 </div>
 <div class="be-actions">
-<button class="be-action" onclick="beOpen('receipt')"><span class="symbol">▣</span><strong>Scan Receipt</strong><small>Capture, review, save</small></button>
-<button class="be-action" onclick="beOpen('expense')"><span class="symbol">⊕</span><strong>Add Expense</strong><small>Quick manual entry</small></button>
-<button class="be-action" onclick="beOpen('mileage')"><span class="symbol">🚘</span><strong>Log Mileage</strong><small>Trips and business purpose</small></button>
-<button class="be-action" onclick="beOpen('equipment')"><span class="symbol">▱</span><strong>Equipment Planner</strong><small>Purchases and scenarios</small></button>
+<button class="be-action" onclick="beOpen('receipt')"><span class="symbol" id="beCameraAction"></span><strong>Scan Receipt</strong><small>Capture, review, save</small></button>
+<button class="be-action" onclick="beOpen('expense')"><span class="symbol" id="beAddAction"></span><strong>Add Expense</strong><small>Quick manual entry</small></button>
+<button class="be-action" onclick="beOpen('mileage')"><span class="symbol" id="beMileageAction"></span><strong>Log Mileage</strong><small>Trips and business purpose</small></button>
+<button class="be-action" onclick="beOpen('equipment')"><span class="symbol" id="beEquipmentAction"></span><strong>Equipment Planner</strong><small>Purchases and scenarios</small></button>
 </div>
 <div id="beFormPanel" class="panel hidden">
 <div class="top"><h2 id="beFormTitle" style="margin:0">New Expense</h2><button class="ghost" onclick="beClose()">Close ✕</button></div>
 <div id="beExpenseForm" class="be-form">
 <label for="beReceipt">Scan or Upload Receipt</label>
-<label style="display:block;background:#222;border-radius:18px;text-align:center;padding:24px 12px;color:white;cursor:pointer" for="beReceipt"><span style="font-size:29px">▣</span><br><strong>Take Photo or Choose Image</strong><br><small>Manual entry now; automated extraction comes with private cloud version</small></label>
+<label style="display:block;background:#222;border-radius:18px;text-align:center;padding:24px 12px;color:white;cursor:pointer" for="beReceipt"><span id="beCameraUpload"></span><br><strong>Take Photo or Choose Image</strong><br><small>Manual entry now; automated extraction comes with private cloud version</small></label>
 <input type="file" id="beReceipt" accept="image/*,application/pdf" onchange="beFileChanged(this)" style="margin-top:10px">
 <p id="beReceiptNote" class="note">Receipts are not uploaded or saved in this version. Keep the original in your private files.</p>
-<div class="be-cols"><div><label for="beDate">Date</label><input type="date" id="beDate"></div><div><label for="beAmount">Amount YOU paid ($)</label><input type="number" min="0" step=".01" id="beAmount" placeholder="0.00"></div></div>
+<div class="be-cols be-date-amount"><div><label for="beDate">Date</label><input type="date" id="beDate"></div><div><label for="beAmount">Amount YOU paid ($)</label><input type="number" min="0" step=".01" id="beAmount" placeholder="0.00"></div></div>
 <label for="beMerchant">Merchant / Event</label><input id="beMerchant" placeholder="College Billiards">
 <label for="beCategory">Expense Category</label><select id="beCategory"></select>
 <label for="bePurpose">Business Purpose</label><textarea id="bePurpose" placeholder="Recruiting prospects, customer acquisition, field training..."></textarea>
@@ -391,14 +402,15 @@ a.href=URL.createObjectURL(blob);a.download='financial-dashboard-backup.json';a.
 renderPlan();
 
 
+const beSvg={camera:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4H9l-2 3H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2-3h-1Z"/><circle cx="12" cy="13" r="3.5"/></svg></span>`,plus:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 7v10M7 12h10"/></svg></span>`,gauge:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 19a9 9 0 1 1 14.2 0"/><path d="M12 13l4-4"/><circle cx="12" cy="13" r="1"/><path d="M5 19h14"/></svg></span>`,laptop:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="13" rx="1"/><path d="M2 20h20l-2-3H4z"/></svg></span>`,users:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5v1"/></svg></span>`,fork:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v7M7 2v7M10 2v7M4 9a3 3 0 0 0 6 0M7 12v10M18 22V2c-4 3-5 8-5 13h5"/></svg></span>`,house:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 3l9 7v11H3zM9 21v-7h6v7"/></svg></span>`,receipt:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 2h14v20l-3-2-4 2-4-2-3 2zM8 7h8M8 11h8M8 15h5"/></svg></span>`,gift:`<span class="be-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18M12 9C3 9 6 2 9 4c2 1 3 5 3 5Zm0 0c9 0 6-7 3-5-2 1-3 5-3 5Z"/></svg></span>`};
 const beCategories=[
-['Recruiting & Team Events','Bowling, billiards, mini golf, waterparks','♧'],
-['Meals & Hospitality','Team meals and prospect meetings','♨'],
-['Housing & Travel','Seasonal rent, hotels and travel','⌂'],
-['Mileage & Vehicle','Business drives, parking and tolls','🚘'],
-['Technology & Equipment','AirPods, laptop, iPad and accessories','▱'],
-['Operations & Subscriptions','Software, supplies and accounting','▤'],
-['Customer Incentives & Acquisition','Cancellation assistance and promotional gifts','♢']
+['Recruiting & Team Events','Bowling, billiards, mini golf, waterparks','users'],
+['Meals & Hospitality','Team meals and prospect meetings','fork'],
+['Housing & Travel','Seasonal rent, hotels and travel','house'],
+['Mileage & Vehicle','Business drives, parking and tolls','gauge'],
+['Technology & Equipment','AirPods, laptop, iPad and accessories','laptop'],
+['Operations & Subscriptions','Software, supplies and accounting','receipt'],
+['Customer Incentives & Acquisition','Cancellation assistance and promotional gifts','gift']
 ];
 const beKey='financeBusinessExpensesV1';
 let be;try{be=JSON.parse(localStorage.getItem(beKey)||'null')}catch(e){}
@@ -469,7 +481,8 @@ be.equipment.forEach(e=>rows.push(['Planned purchase','',e.name,e.cost,'Equipmen
 const blob=new Blob([rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
 a.href=URL.createObjectURL(blob);a.download='business-expenses-export.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
-$('beCategories').innerHTML=beCategories.map(([name,desc,icon])=>`<button class="be-cat" onclick="beOpen('expense', '${name}')"><span class="symbol">${icon}</span><span style="flex:1"><strong>${name}</strong><small>${desc}</small></span><span style="color:#999;font-size:22px">›</span></button>`).join('');
+$('beCameraAction').innerHTML=beSvg.camera;$('beAddAction').innerHTML=beSvg.plus;$('beMileageAction').innerHTML=beSvg.gauge;$('beEquipmentAction').innerHTML=beSvg.laptop;$('beCameraUpload').innerHTML=beSvg.camera;
+$('beCategories').innerHTML=beCategories.map(([name,desc,icon])=>`<button class="be-cat" onclick="beOpen('expense', '${name}')"><span class="symbol">${beSvg[icon]}</span><span style="flex:1"><strong>${name}</strong><small>${desc}</small></span><span style="color:#999;font-size:22px">›</span></button>`).join('');
 $('beCategory').innerHTML=beCategories.map(([name])=>`<option>${name}</option>`).join('');
 $('beFilter').innerHTML='<option value="">All categories</option>'+beCategories.map(([name])=>`<option>${name}</option>`).join('');
 $('beYear').innerHTML=[2026,2027,2028,2029,2030].map(y=>`<option value="${y}" ${y===new Date().getFullYear()?'selected':''}>${y}</option>`).join('');
