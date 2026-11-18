@@ -23,6 +23,16 @@ button.action:active,.nav:active{background:#303030}.action.full{width:100%}.gho
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.toggle input{width:23px;height:23px;accent-color:#fff}
 .hidden{display:none!important}.note{font-size:12px;line-height:1.6;color:#999}.bar{background:#222;border-radius:10px;height:8px;overflow:hidden}.bar>div{background:#fff;height:100%;width:0%}
 footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
+
+.budget-bill{display:flex;gap:11px;align-items:center;border-bottom:1px solid #222;padding:13px 0}
+.checkcircle{border:2px solid #555;background:#000;color:#000;border-radius:50%;width:34px;height:34px;flex-shrink:0;font-size:22px;font-weight:800;line-height:28px;padding:0}
+.checkcircle.done{background:#e8bd42;border-color:#e8bd42}
+.bill-edit{flex:1;min-width:0}.bill-edit input{background:transparent;border:0;color:white;font-size:16px;min-width:0;width:100%;padding:3px 0}
+.bill-edit .due{color:#999;font-size:12px}.bill-edit .due input{width:44px;color:#aaa;font-size:13px}
+.bill-money{display:flex;align-items:center;color:white;font-weight:650}.bill-money input{background:transparent;border:0;color:white;font-size:17px;font-weight:650;width:76px;text-align:right}
+.monthgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.monthitem{display:flex;align-items:center;gap:9px;border:0;background:transparent;color:#fff;padding:8px 0;text-align:left;font-size:15px}.monthitem .checkcircle{width:25px;height:25px;line-height:20px;font-size:16px}
+.monthitem.complete span:last-child{text-decoration:line-through;color:#999}
+.budget-select{width:100%;padding:12px;border:1px solid #444;border-radius:12px;background:#171717;color:white;font-size:17px}
 </style></head>
 <body>
 <section id="home">
@@ -30,11 +40,11 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <p>One home for your connected calculators and monthly tracking.</p>
 <div class="panel" style="padding:16px 22px">
 <button class="nav" onclick="show('sales')"><div class="ico">☷</div><div><strong>Sales &amp; Income</strong><br><span>Production, reps, overrides, bonuses and residuals</span></div><div class="chevron">›</div></button>
-<button class="nav" onclick="coming('Personal Budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Monthly bills and everyday spending</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="show('budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Monthly bills and everyday spending</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Business Expenses')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Tax Planning')"><div class="ico">▥</div><div><strong>Tax Planning</strong><br><span>S-Corp setup, tax estimates and reserves</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Homeownership')"><div class="ico">⌂</div><div><strong>Homeownership</strong><br><span>Down payment and purchase timeline</span></div><div class="chevron">›</div></button>
-</div><p class="note">Sales &amp; Income is active. Other categories are placeholders for future modules.</p>
+</div><p class="note">Sales &amp; Income and Personal Budget are active. Other categories are coming soon.</p>
 </section>
 <section id="sales" class="hidden">
 <button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Sales &amp; income · 2027 plan</div><h1>Sales &amp; Income</h1>
@@ -78,6 +88,24 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 </div>
 <button class="action full" onclick="resetAll()">Reset to starting assumptions</button>
 </section>
+
+<section id="budget" class="hidden">
+<button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Personal budget</div><h1>Monthly Bills</h1>
+<p>Check off each bill. A month completes automatically when every bill is paid.</p>
+<div class="panel">
+<div class="top"><h2 style="margin-bottom:12px">Bills</h2><span class="pill" id="billStatus">0/5 paid</span></div>
+<select class="budget-select" id="monthSelect" onchange="changeBillMonth(this.value)"></select>
+<div id="billList" style="margin-top:15px"></div>
+<button class="action full" onclick="addBill()" style="margin-top:16px">+ Add Another Bill</button>
+<hr><div class="metrics"><div><div class="metric-label">Total bills</div><div class="metric-value" id="billTotal">$0</div></div><div><div class="metric-label">Paid</div><div class="metric-value" id="billPaid">$0</div></div><div><div class="metric-label">Remaining</div><div class="metric-value" id="billRemaining">$0</div></div><div><div class="metric-label">Progress</div><div class="metric-value" id="billProgress">0%</div></div></div>
+<div class="bar" style="margin-top:20px"><div id="billProgressBar"></div></div>
+</div>
+<div class="panel"><div class="top"><h2 style="margin-bottom:8px">2026 overview</h2><span class="pill" id="yearProgress">0/12</span></div><p class="note">Months check themselves off when all their bills are paid.</p><div class="monthgrid" id="monthGrid"></div></div>
+<div class="panel"><h2 style="margin-bottom:10px">Miscellaneous</h2><p class="note">Use this for one-off expenses in the selected month.</p><div id="miscList"></div><button class="action full" onclick="addMisc()">+ Add Miscellaneous Expense</button></div>
+<p style="text-align:center;color:#eee;font-style:italic;padding:20px 10px">“My future is built not on debt, but on discipline, vision, and courage.”</p>
+<p class="note">Your data stays in this browser on this device. GitHub hosts the app code, not your bills. Avoid clearing Safari website data without exporting a backup.</p>
+<button class="action full" onclick="exportBills()">Export bills backup (JSON)</button>
+</section>
 <footer>Saved automatically on this device when opened in a browser that supports local storage. Local file previews may show the numbers but disable interactivity. For reliable iPhone Home Screen use, publish this file to an HTTPS static host and open it in Safari.</footer>
 <script>
 const personalTiers=[[85000,40],[105000,42],[130000,45],[150000,50],[170000,53],[190000,56],[215000,58],[230000,60],[250000,62],[300000,64],[340000,66],[385000,68],[425000,70],[552500,75],[850000,80]];
@@ -89,7 +117,7 @@ const $=id=>document.getElementById(id), money=n=>'$'+Math.round(n).toLocaleStri
 const getTier=n=>{let p=40;for(const [min,pct] of personalTiers)if(n>=min)p=pct;return p};
 const getMgr=n=>{let found=null;for(const [min,pct,name] of managerTiers)if(n>=min)found={min,pct,name};return found};
 function save(){try{localStorage.setItem('financeSales2027',JSON.stringify(s))}catch(e){}}
-function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');window.scrollTo(0,0);location.hash=which==='sales'?'sales':''}
+function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');$('budget').classList.toggle('hidden',which!=='budget');window.scrollTo(0,0);location.hash=which==='home'?'':which}
 function coming(name){alert(name+' is planned for a future update. Sales & Income is ready now.')}
 function sliderMarkup(id,label,min,max,step,value){return `<div class="item"><div class="item-head"><label for="${id}">${label}</label><span class="value" id="${id}Val">${money(value)}</span></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="sliderChange('${id}',this.value)"></div>`}
 function drawSliders(){
@@ -131,6 +159,31 @@ save();
 }
 function resetAll(){if(!confirm('Reset sales assumptions and reps?'))return;s=JSON.parse(JSON.stringify(defaults));nextId=3;drawSliders();drawReps();update()}
 function exportCSV(){let active=(s.weekly*s.weeks+s.pre)*s.retention/100;let rows=[['Metric','Value'],['Weekly',s.weekly],['Weeks',s.weeks],['Preseason',s.pre],['Active retention',s.retention],['Active revenue',active],['Commission tier',getTier(active)],['EMB',s.embOn?s.emb:0],...s.reps.map(r=>['Rep: '+r.name,r.active]),['Projected combined gross',$('grand').textContent]];let blob=new Blob([rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sales-income-2027.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-drawSliders();drawReps();for(const r of s.reps){let el=$('rep'+r.id);if(el)el.oninput=e=>{r.active=+e.target.value;update()}};document.querySelectorAll('#reps input[type=range]').forEach(el=>el.oninput=e=>{let id=+el.id.slice(3);let r=s.reps.find(x=>x.id===id);if(r){r.active=+e.target.value;update()}});$('embOn').onchange=e=>{s.embOn=e.target.checked;update()};update();if(location.hash==='#sales')show('sales');
+drawSliders();drawReps();for(const r of s.reps){let el=$('rep'+r.id);if(el)el.oninput=e=>{r.active=+e.target.value;update()}};document.querySelectorAll('#reps input[type=range]').forEach(el=>el.oninput=e=>{let id=+el.id.slice(3);let r=s.reps.find(x=>x.id===id);if(r){r.active=+e.target.value;update()}});$('embOn').onchange=e=>{s.embOn=e.target.checked;update()};update();if(location.hash==='#sales')show('sales');if(location.hash==='#budget')show('budget');
 const oldAdd=addRep;addRep=function(){oldAdd();document.querySelectorAll('#reps input[type=range]').forEach(el=>el.oninput=e=>{let r=s.reps.find(x=>x.id===+el.id.slice(3));if(r){r.active=+e.target.value;update()}})};
+
+// Personal budget: per-month snapshots prevent later edits from changing old months.
+const billMonths=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const billDefaults=[{id:'rent',name:'Rent (my portion)',amount:1800,due:1},{id:'car',name:'Car insurance',amount:281,due:0},{id:'sdge',name:'SDG&E',amount:100,due:18},{id:'capital',name:'Capital One',amount:200,due:18},{id:'credit',name:'Credit One',amount:30,due:21}];
+const clone=x=>JSON.parse(JSON.stringify(x));
+let budget;try{budget=JSON.parse(localStorage.getItem('financeBills2026')||'null')}catch(e){}
+if(!budget||!budget.months)budget={year:2026,selected:10,months:{},template:clone(billDefaults)};
+function ensureBillMonth(i){if(!budget.months[i])budget.months[i]={bills:clone(budget.template).map(b=>({...b,paid:false})),misc:[]};return budget.months[i]}
+function saveBills(){try{localStorage.setItem('financeBills2026',JSON.stringify(budget))}catch(e){}}
+function changeBillMonth(v){budget.selected=+v;ensureBillMonth(budget.selected);saveBills();renderBills()}
+function updateBill(id,field,value,misc=false){let list=misc?ensureBillMonth(budget.selected).misc:ensureBillMonth(budget.selected).bills;let b=list.find(x=>x.id===id);if(!b)return;b[field]=field==='amount'||field==='due'?Math.max(0,Number(value)||0):value;
+// Update future month's default bill only; existing month snapshots remain unchanged.
+if(!misc&&field!=='paid'){let t=budget.template.find(x=>x.id===id);if(t)t[field]=b[field]}
+saveBills();renderBills()}
+function toggleBill(id){let b=ensureBillMonth(budget.selected).bills.find(x=>x.id===id);if(b){b.paid=!b.paid;saveBills();renderBills()}}
+function removeBill(id,misc=false){let m=ensureBillMonth(budget.selected);let list=misc?m.misc:m.bills;let idx=list.findIndex(x=>x.id===id);if(idx<0)return;list.splice(idx,1);if(!misc)budget.template=budget.template.filter(x=>x.id!==id);saveBills();renderBills()}
+function addBill(){let id='bill'+Date.now();let b={id,name:'New bill',amount:0,due:1,paid:false};budget.template.push(clone(b));ensureBillMonth(budget.selected).bills.push(b);saveBills();renderBills()}
+function addMisc(){let id='misc'+Date.now();ensureBillMonth(budget.selected).misc.push({id,name:'Misc expense',amount:0});saveBills();renderBills()}
+function billRow(b,misc=false){let id=JSON.stringify(b.id);return `<div class="budget-bill">${misc?'':`<button class="checkcircle ${b.paid?'done':''}" aria-label="${b.paid?'Mark unpaid':'Mark paid'}" onclick='toggleBill(${id})'>${b.paid?'✓':''}</button>`}<div class="bill-edit"><input aria-label="Bill name" value="${safe(b.name)}" onchange='updateBill(${id},"name",this.value,${misc})'>${misc?'':`<div class="due">Due day <input aria-label="Due day" type="number" min="0" max="31" value="${b.due||''}" placeholder="—" onchange='updateBill(${id},"due",this.value)'></div>`}</div><div class="bill-money">$<input aria-label="Amount" type="number" min="0" step="1" value="${b.amount}" onchange='updateBill(${id},"amount",this.value,${misc})'></div><button class="ghost" aria-label="Remove" onclick='removeBill(${id},${misc})'>×</button></div>`}
+function renderBills(){let m=ensureBillMonth(budget.selected);$('monthSelect').innerHTML=billMonths.map((name,i)=>`<option value="${i}" ${i===budget.selected?'selected':''}>${name} ${budget.year}</option>`).join('');$('billList').innerHTML=m.bills.map(b=>billRow(b)).join('');$('miscList').innerHTML=m.misc.map(b=>billRow(b,true)).join('');
+let total=m.bills.reduce((a,b)=>a+b.amount,0)+m.misc.reduce((a,b)=>a+b.amount,0),paid=m.bills.filter(b=>b.paid).reduce((a,b)=>a+b.amount,0),count=m.bills.filter(b=>b.paid).length,complete=m.bills.length>0&&count===m.bills.length;
+$('billTotal').textContent=money(total);$('billPaid').textContent=money(paid);$('billRemaining').textContent=money(total-paid);$('billStatus').textContent=count+'/'+m.bills.length+' paid';$('billProgress').textContent=Math.round(count/Math.max(1,m.bills.length)*100)+'%';$('billProgressBar').style.width=count/Math.max(1,m.bills.length)*100+'%';
+let completed=0;$('monthGrid').innerHTML=billMonths.map((name,i)=>{let other=budget.months[i],done=other&&other.bills.length>0&&other.bills.every(b=>b.paid);if(done)completed++;return `<button class="monthitem ${done?'complete':''}" onclick="changeBillMonth(${i})"><span class="checkcircle ${done?'done':''}">${done?'✓':''}</span><span>${name}</span></button>`}).join('');$('yearProgress').textContent=completed+'/12';saveBills()}
+function exportBills(){let blob=new Blob([JSON.stringify(budget,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='monthly-bills-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+renderBills();
 </script></body></html>
