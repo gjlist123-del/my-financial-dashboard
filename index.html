@@ -33,6 +33,22 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 .monthgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}.monthitem{display:flex;align-items:center;gap:9px;border:0;background:transparent;color:#fff;padding:8px 0;text-align:left;font-size:15px}.monthitem .checkcircle{width:25px;height:25px;line-height:20px;font-size:16px}
 .monthitem.complete span:last-child{text-decoration:line-through;color:#999}
 .budget-select{width:100%;padding:12px;border:1px solid #444;border-radius:12px;background:#171717;color:white;font-size:17px}
+
+.budget-tabs{display:flex;gap:7px;overflow-x:auto;margin:18px 0 8px}
+.budget-tabs button{background:#111;color:#aaa;border:1px solid #333;border-radius:12px;padding:12px 14px;white-space:nowrap;font-size:13px}
+.budget-tabs button.selected{background:#fff;color:#000;border-color:#fff;font-weight:700}
+.budget-sub.hidden{display:none}
+.field{width:100%;background:#151515;border:1px solid #444;color:white;border-radius:10px;padding:11px;font-size:16px}
+.line{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0}
+.line strong{font-variant-numeric:tabular-nums}
+.cash-table{width:100%;border-collapse:collapse;font-size:13px}
+.cash-table th,.cash-table td{border-bottom:1px solid #303030;padding:10px 5px;text-align:right}
+.cash-table th:first-child,.cash-table td:first-child{text-align:left}
+.cash-table input{background:#151515;border:1px solid #333;color:#fff;border-radius:7px;padding:8px 3px;width:80px;text-align:right;font-size:14px}
+.cash-table .negative{color:#ff9c9c}
+.cash-table-wrap{overflow-x:auto}
+.alloc-bar{display:flex;height:12px;border-radius:20px;overflow:hidden;background:#222;gap:2px}
+.alloc-bar div{transition:width .15s}
 </style></head>
 <body>
 <section id="home">
@@ -40,7 +56,7 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <p>One home for your connected calculators and monthly tracking.</p>
 <div class="panel" style="padding:16px 22px">
 <button class="nav" onclick="show('sales')"><div class="ico">☷</div><div><strong>Sales &amp; Income</strong><br><span>Production, reps, overrides, bonuses and residuals</span></div><div class="chevron">›</div></button>
-<button class="nav" onclick="show('budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Monthly bills and everyday spending</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="show('budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Bills, seasonal cash flow and savings</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Business Expenses')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Tax Planning')"><div class="ico">▥</div><div><strong>Tax Planning</strong><br><span>S-Corp setup, tax estimates and reserves</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Homeownership')"><div class="ico">⌂</div><div><strong>Homeownership</strong><br><span>Down payment and purchase timeline</span></div><div class="chevron">›</div></button>
@@ -90,7 +106,14 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 </section>
 
 <section id="budget" class="hidden">
-<button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Personal budget</div><h1>Monthly Bills</h1>
+<button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Personal budget</div><h1>Personal Budget</h1>
+<p>Manage bills, forecast your off-season, and assign your savings without moving money between accounts.</p>
+<div class="budget-tabs">
+<button id="tab-bills" class="selected" onclick="budgetTab('bills')">Monthly Bills</button>
+<button id="tab-cash" onclick="budgetTab('cash')">Cash Flow</button>
+<button id="tab-savings" onclick="budgetTab('savings')">Savings</button>
+</div>
+<div id="sub-bills" class="budget-sub">
 <p>Check off each bill. A month completes automatically when every bill is paid.</p>
 <div class="panel">
 <div class="top"><h2 style="margin-bottom:12px">Bills</h2><span class="pill" id="billStatus">0/5 paid</span></div>
@@ -105,6 +128,49 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <p style="text-align:center;color:#eee;font-style:italic;padding:20px 10px">“My future is built not on debt, but on discipline, vision, and courage.”</p>
 <p class="note">Your data stays in this browser on this device. GitHub hosts the app code, not your bills. Avoid clearing Safari website data without exporting a backup.</p>
 <button class="action full" onclick="exportBills()">Export bills backup (JSON)</button>
+</div>
+<div id="sub-cash" class="budget-sub hidden">
+<div class="panel"><div class="top"><h2 style="margin:0">Annual Cash Flow</h2><span class="pill">Seasonal plan</span></div>
+<p class="note">Enter expected or received income for each month. The forecast uses your monthly bill templates plus flexible spending. Income is cash received, not sales production or gross projections.</p>
+<div class="line"><label for="forecastYear">Forecast year</label><select id="forecastYear" class="field" style="width:125px" onchange="setForecastYear(this.value)"></select></div>
+<div class="line"><span>Starting bank savings</span><strong id="cashStartLabel">$0</strong></div>
+<p class="note">Edit your actual savings in the Savings section. Taxes and protected funds are tracked separately, not automatically deducted twice.</p>
+<div class="line"><span>Flexible spending / month</span><strong id="flexTotal">$0</strong></div>
+<div id="flexSliders"></div>
+<hr><div class="metrics">
+<div><div class="metric-label">Projected year-end cash</div><div class="metric-value" id="yearEndCash">$0</div></div>
+<div><div class="metric-label">Lowest projected cash</div><div class="metric-value" id="lowCash">$0</div></div>
+<div><div class="metric-label">Annual cash received</div><div class="metric-value" id="annualReceived">$0</div></div>
+<div><div class="metric-label">Annual spending</div><div class="metric-value" id="annualSpend">$0</div></div>
+</div></div>
+<div class="panel"><h2>12-Month Forecast</h2>
+<p class="note">Income is entered by month. Bills use the amounts saved in Monthly Bills for this year, or your current recurring bill template for months not yet opened. Flexible spending is separate, so rent and bills are not counted twice.</p>
+<div class="cash-table-wrap"><table class="cash-table"><thead><tr><th>Month</th><th>Income $</th><th>Expenses</th><th>End cash</th></tr></thead><tbody id="cashRows"></tbody></table></div>
+<p class="note">This is a planning forecast, not a bank statement. One-time debt payoff, business purchases, wedding costs, and tax payments should be entered as additional outflows below.</p>
+<div class="line"><span>Additional planned outflows / year</span><strong id="extraTotal">$0</strong></div>
+<div id="extraRows"></div>
+</div>
+</div>
+<div id="sub-savings" class="budget-sub hidden">
+<div class="panel"><div class="eyebrow">One real account</div><h2 style="margin:10px 0">Savings &amp; Allocations</h2>
+<label for="actualSavings" class="metric-label">Actual savings account balance</label>
+<input class="field" id="actualSavings" type="number" min="0" step="100" onchange="setBankSavings(this.value)" style="font-size:27px;font-weight:700;margin:12px 0">
+<p class="note">Virtual allocations are labels for your money, not transfers. Do not count the same money in more than one bucket.</p>
+<div class="alloc-bar"><div id="segProtected" style="background:#d3ad4f"></div><div id="segLiving" style="background:#888"></div><div id="segHome" style="background:#43876a"></div></div>
+<div id="allocationSliders"></div>
+<hr><div class="metrics">
+<div><div class="metric-label">Protected reserves</div><div class="metric-value" id="protectedResult">$0</div></div>
+<div><div class="metric-label">Living fund</div><div class="metric-value" id="livingResult">$0</div></div>
+<div><div class="metric-label">Home savings</div><div class="metric-value" id="homeResult">$0</div></div>
+<div><div class="metric-label">Unallocated</div><div class="metric-value" id="unallocatedResult">$0</div></div>
+</div><p id="allocationWarning" class="note"></p></div>
+<div class="panel"><h2>Off-Season Readiness</h2>
+<div class="metrics">
+<div><div class="metric-label">Monthly baseline</div><div class="metric-value" id="monthlyBaseline">$0</div></div>
+<div><div class="metric-label">Living fund runway</div><div class="metric-value" id="runway">0 months</div></div>
+</div><p class="note">Runway uses only your designated living fund, not tax reserves or money set aside for your house. Tax Planning can eventually populate the tax reserve automatically; it is manual for now.</p></div>
+<button class="action full" onclick="exportBudgetPlan()">Export budget plan backup (JSON)</button>
+</div>
 </section>
 <footer>Saved automatically on this device when opened in a browser that supports local storage. Local file previews may show the numbers but disable interactivity. For reliable iPhone Home Screen use, publish this file to an HTTPS static host and open it in Safari.</footer>
 <script>
@@ -186,4 +252,74 @@ $('billTotal').textContent=money(total);$('billPaid').textContent=money(paid);$(
 let completed=0;$('monthGrid').innerHTML=billMonths.map((name,i)=>{let other=budget.months[i],done=other&&other.bills.length>0&&other.bills.every(b=>b.paid);if(done)completed++;return `<button class="monthitem ${done?'complete':''}" onclick="changeBillMonth(${i})"><span class="checkcircle ${done?'done':''}">${done?'✓':''}</span><span>${name}</span></button>`}).join('');$('yearProgress').textContent=completed+'/12';saveBills()}
 function exportBills(){let blob=new Blob([JSON.stringify(budget,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='monthly-bills-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 renderBills();
+
+const planKey='financePersonalPlanV1';
+const planDefaults={bank:29000,year:2026,flex:{groceries:870,dining:1300,transport:130,entertainment:250,child:110,other:100},alloc:{tax:0,emergency:5000,commitments:0,living:12000,home:12000},incomes:{},extras:{}};
+let plan;try{plan=JSON.parse(localStorage.getItem(planKey)||'null')}catch(e){}
+if(!plan||!plan.flex)plan=clone(planDefaults);
+for(const key of ['alloc','incomes','extras'])if(!plan[key])plan[key]=clone(planDefaults[key]);
+function savePlan(){try{localStorage.setItem(planKey,JSON.stringify(plan))}catch(e){}}
+function budgetTab(name){
+for(const k of ['bills','cash','savings']){
+$('sub-'+k).classList.toggle('hidden',k!==name);
+$('tab-'+k).classList.toggle('selected',k===name)
+}
+if(name==='cash'||name==='savings')renderPlan();
+}
+const flexNames={groceries:'Groceries',dining:'Eating out',transport:'Transportation',entertainment:'Entertainment',child:'Child activities & extras',other:'Other flexible spending'};
+const allocNames={tax:'Tax reserve',emergency:'Emergency reserve',commitments:'Other commitments',living:'Off-season living fund',home:'Home savings'};
+function planSlider(key,label,val,max,fn){
+return `<div class="item"><div class="item-head"><label>${label}</label><span class="value">${money(val)}</span></div><input type="range" min="0" max="${max}" step="50" value="${val}" onchange="${fn}('${key}',this.value)"></div>`;
+}
+function setFlex(key,v){plan.flex[key]=Math.max(0,+v||0);savePlan();renderPlan()}
+function setAllocation(key,v){plan.alloc[key]=Math.max(0,+v||0);savePlan();renderPlan()}
+function setBankSavings(v){plan.bank=Math.max(0,+v||0);savePlan();renderPlan()}
+function setForecastYear(v){plan.year=+v;savePlan();renderPlan()}
+function setIncome(month,v){plan.incomes[plan.year]??={};plan.incomes[plan.year][month]=Math.max(0,+v||0);savePlan();renderPlan(false)}
+function setExtra(month,v){plan.extras[plan.year]??={};plan.extras[plan.year][month]=Math.max(0,+v||0);savePlan();renderPlan(false)}
+function sumVals(obj){return Object.values(obj).reduce((a,v)=>a+(Number(v)||0),0)}
+function monthlyBillsFor(i){
+if(plan.year===budget.year&&budget.months[i]){let m=budget.months[i];return sumVals(m.bills.map(b=>b.amount))+sumVals(m.misc.map(b=>b.amount))}
+return sumVals(budget.template.map(b=>b.amount))
+}
+function renderPlan(rebuildInputs=true){
+const flex=sumVals(plan.flex),alloc=sumVals(plan.alloc),remaining=plan.bank-alloc;
+$('actualSavings').value=plan.bank;
+$('cashStartLabel').textContent=money(plan.bank);
+$('flexTotal').textContent=money(flex);
+$('flexSliders').innerHTML=Object.entries(flexNames).map(([k,label])=>planSlider(k,label,plan.flex[k],2500,'setFlex')).join('');
+$('allocationSliders').innerHTML=Object.entries(allocNames).map(([k,label])=>planSlider(k,label,plan.alloc[k],100000,'setAllocation')).join('');
+$('protectedResult').textContent=money(plan.alloc.tax+plan.alloc.emergency+plan.alloc.commitments);
+$('livingResult').textContent=money(plan.alloc.living);
+$('homeResult').textContent=money(plan.alloc.home);
+$('unallocatedResult').textContent=money(remaining);
+$('allocationWarning').textContent=remaining<0?'Your allocations exceed your real savings by '+money(-remaining)+'. Reduce one or more buckets.':'Virtual allocations are saved locally. Tax reserve is a placeholder until Tax Planning is built.';
+for(const [id,k] of [['segProtected',plan.alloc.tax+plan.alloc.emergency+plan.alloc.commitments],['segLiving',plan.alloc.living],['segHome',plan.alloc.home]])$(id).style.width=(plan.bank>0?Math.max(0,Math.min(100,k/plan.bank*100)):0)+'%';
+const baseline=monthlyBillsFor(10)+flex;
+$('monthlyBaseline').textContent=money(baseline);
+$('runway').textContent=baseline>0?(plan.alloc.living/baseline).toFixed(1)+' months':'—';
+$('forecastYear').innerHTML=[2026,2027,2028,2029,2030].map(y=>`<option value="${y}" ${y===plan.year?'selected':''}>${y}</option>`).join('');
+const income=plan.incomes[plan.year]||{},extra=plan.extras[plan.year]||{};
+let balance=plan.bank,low=balance,totalIncome=0,totalExpenses=0,rows=[],extraRows=[];
+billMonths.forEach((name,i)=>{
+const received=Number(income[i])||0,add=Number(extra[i])||0,expenses=monthlyBillsFor(i)+flex+add;
+balance+=received-expenses;low=Math.min(low,balance);totalIncome+=received;totalExpenses+=expenses;
+rows.push(`<tr><td>${name.slice(0,3)}</td><td><input type="number" min="0" step="100" aria-label="${name} income" value="${received||''}" placeholder="0" onchange="setIncome(${i},this.value)"></td><td>${money(expenses)}</td><td class="${balance<0?'negative':''}">${money(balance)}</td></tr>`);
+extraRows.push(`<div class="line"><label for="extra${i}">${name}</label><input class="field" id="extra${i}" type="number" min="0" step="100" value="${add||''}" placeholder="$0" style="width:120px" onchange="setExtra(${i},this.value)"></div>`);
+});
+$('cashRows').innerHTML=rows.join('');
+if(rebuildInputs)$('extraRows').innerHTML=extraRows.join('');
+$('extraTotal').textContent=money(sumVals(extra));
+$('yearEndCash').textContent=money(balance);
+$('lowCash').textContent=money(low);
+$('annualReceived').textContent=money(totalIncome);
+$('annualSpend').textContent=money(totalExpenses);
+}
+function exportBudgetPlan(){
+const data={plan,bills:budget,sales:s,exportedAt:new Date().toISOString()};
+const a=document.createElement('a'),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+a.href=URL.createObjectURL(blob);a.download='financial-dashboard-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+renderPlan();
+
 </script></body></html>
