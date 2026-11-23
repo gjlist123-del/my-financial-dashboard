@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#000000"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="My Finances">
-<title>My Finances — Sales & Income</title>
+<title>My Finances — Financial Dashboard V7</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#000;color:#fff;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0 auto;max-width:720px;padding:25px 17px 90px;background:#000}
@@ -72,6 +72,19 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 .be-icon{display:inline-block;width:29px;height:29px;vertical-align:middle;color:#fff}
 .be-icon svg{display:block;width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:480px){.be-date-amount{grid-template-columns:minmax(0,1fr)}.be-date-amount input{width:100%}.be-date-amount>div{width:100%}}
+
+/* V7: unified muted color system */
+:root{--forest:#203b30;--slate:#293549;--bronze:#3b3028;--violet:#302643;--charcoal:#292929}
+.nav .ico{background:#242424;color:white}.nav:nth-child(1) .ico{background:var(--forest)}.nav:nth-child(2) .ico{background:var(--slate)}.nav:nth-child(3) .ico{background:var(--bronze)}.nav:nth-child(4) .ico{background:var(--charcoal)}.nav:nth-child(5) .ico{background:var(--violet)}
+#sales>.panel:first-of-type{border-color:#365346}#budget>.panel:first-of-type{border-color:#384b66}#business>.panel:first-of-type{border-color:#55443a}
+.budget-tabs button.selected{background:var(--slate);color:#fff;border-color:#617087}
+.be-action:active{background:var(--bronze)}.be-cat .symbol{background:#2d2926}
+.iv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.iv-card{border:0;border-radius:19px;color:#fff;text-align:left;padding:21px 17px;min-height:136px;display:flex;flex-direction:column;gap:13px;justify-content:center}.iv-card strong{font-size:19px}.iv-card small{color:#c2c2c2;font-size:12px;line-height:1.5}.iv-card .iv-icon{font-size:27px}.iv-card[data-cat="Stocks & ETFs"]{background:#203b30}.iv-card[data-cat="Cryptocurrency"]{background:#302643}.iv-card[data-cat="Real Estate"]{background:#383322}.iv-card[data-cat="Fixed Income"]{background:#293549}.iv-card[data-cat="Alternative Assets"]{background:#3c2c30}.iv-card[data-cat="Investment Explorer"]{background:#292929}
+.iv-tabbar{display:flex;gap:7px;overflow-x:auto;margin:18px 0}.iv-tabbar button{background:#171717;color:#bbb;border:1px solid #333;padding:12px;border-radius:12px;white-space:nowrap}.iv-tabbar button.active{background:var(--violet);color:#fff;border-color:#625078}
+.iv-form label{display:block;color:#aaa;font-size:13px;margin:12px 0 6px}.iv-form input,.iv-form select{width:100%;background:#111;color:#fff;border:1px solid #444;border-radius:11px;padding:13px;font-size:16px;min-width:0}
+.iv-row{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #2b2b2b;padding:15px 0}.iv-row small{display:block;color:#aaa;margin-top:4px}.iv-row .ghost{padding:5px}
+.iv-positive{color:#82d6a4}.iv-negative{color:#f19a9a}.iv-chart{width:100%;height:180px;display:block}.iv-mock{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.iv-tile{border-radius:5px;padding:13px 4px;text-align:center;font-size:12px;color:white;min-height:64px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}.iv-tile strong{font-size:13px}.iv-tile small{color:#f0f0f0}
+@media(max-width:400px){.iv-card{padding:16px 13px;min-height:128px}.iv-card strong{font-size:16px}.iv-row{flex-wrap:wrap}}
 </style></head>
 <body>
 <section id="home">
@@ -81,9 +94,10 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <button class="nav" onclick="show('sales')"><div class="ico">☷</div><div><strong>Sales &amp; Income</strong><br><span>Production, reps, overrides, bonuses and residuals</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="show('budget')"><div class="ico">▤</div><div><strong>Personal Budget</strong><br><span>Bills, seasonal cash flow and savings</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="show('business')"><div class="ico">▣</div><div><strong>Business Expenses</strong><br><span>Recruiting, travel and operating costs</span></div><div class="chevron">›</div></button>
+<button class="nav" onclick="show('investments')"><div class="ico">⌂</div><div><strong>Investments</strong><br><span>Portfolio, markets and real estate</span></div><div class="chevron">›</div></button>
 <button class="nav" onclick="coming('Tax Planning')"><div class="ico">▥</div><div><strong>Tax Planning</strong><br><span>S-Corp setup, tax estimates and reserves</span></div><div class="chevron">›</div></button>
-<button class="nav" onclick="coming('Homeownership')"><div class="ico">⌂</div><div><strong>Homeownership</strong><br><span>Down payment and purchase timeline</span></div><div class="chevron">›</div></button>
-</div><p class="note">Sales &amp; Income, Personal Budget and Business Expenses are active. Tax Planning and Homeownership are coming soon.</p>
+
+</div><p class="note">Sales &amp; Income, Personal Budget and Business Expenses are active. Investments is active. Tax Planning is coming later.</p>
 </section>
 <section id="sales" class="hidden">
 <button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Sales &amp; income · 2027 plan</div><h1>Sales &amp; Income</h1>
@@ -249,6 +263,26 @@ footer{margin-top:30px;color:#888;font-size:12px;line-height:1.6}
 <div class="panel"><h2>Sigma Commission Deductions</h2><p class="note">When housing is withheld from commissions, record it as a Sigma deduction. Do not enter it again as a personal bank expense. Reconcile gross commission, withholding, and net deposit using your Sigma statements.</p><div id="beSigmaSummary"></div></div>
 <p class="note">Privacy: records in this version are stored locally in this browser, not synced or encrypted as a financial service. Do not put receipts or private financial exports into a public GitHub repository. Back up your records regularly.</p>
 </section>
+
+<section id="investments" class="hidden">
+<button class="ghost" onclick="show('home')">‹ Dashboard</button><div class="eyebrow">Financial dashboard · portfolio</div><h1>My Investments</h1>
+<p>Track the value of what you own. Market previews are illustrative; your own entries are real.</p>
+<div class="panel metrics"><div><div class="metric-label">Portfolio Value</div><div class="metric-value" id="ivTotal">$0</div><small>Recorded investments</small></div><div><div class="metric-label">Change Since Tracking</div><div class="metric-value" id="ivChange">$0</div><small id="ivPercent">Excludes contributions and withdrawals</small></div></div>
+<div class="iv-tabbar"><button id="ivTabPortfolio" class="active" onclick="ivTab('Portfolio')">My Portfolio</button><button id="ivTabMarkets" onclick="ivTab('Markets')">Market Explorer</button><button id="ivTabGoals" onclick="ivTab('Goals')">Real Estate &amp; Goals</button></div>
+<div id="ivPortfolio">
+<div class="panel"><div class="top"><h2 style="margin:0">Portfolio History</h2><span class="pill">Since tracking</span></div><svg class="iv-chart" id="ivChart" viewBox="0 0 340 180" preserveAspectRatio="none" aria-label="Portfolio value over time"></svg><p class="note" id="ivChartNote">Add an investment to begin your history.</p></div>
+<div class="panel"><div class="top"><h2 style="margin:0">Your Assets</h2><span class="pill" id="ivAssetCount">0 assets</span></div><div class="iv-grid" style="margin-top:18px" id="ivAssetCards"></div></div>
+<div class="panel"><div class="top"><h2 style="margin:0">Holdings</h2><button class="action" onclick="ivOpenAdd()">+ Add Investment</button></div><div id="ivHoldings"></div></div>
+<div class="panel hidden" id="ivEntryPanel"><div class="top"><h2 id="ivEntryTitle" style="margin:0">Add Investment</h2><button class="ghost" onclick="ivClose()">✕ Close</button></div>
+<div class="iv-form" id="ivAddForm"><label>Investment name</label><input id="ivName" placeholder="Brokerage account, Bitcoin, collectibles"><label>Asset category</label><select id="ivCategory"></select><label>Value today ($)</label><input id="ivValue" type="number" min="0" step=".01" placeholder="0.00"><label>Starting date</label><input id="ivDate" type="date"><p class="note">The first value becomes your tracking baseline, not your original cost basis. Do not include bank savings already allocated in Personal Budget.</p><button class="action full" onclick="ivAdd()">Save Investment</button></div>
+<div class="iv-form hidden" id="ivUpdateForm"><p id="ivUpdatingLabel"></p><label>New current value ($)</label><input id="ivNewValue" type="number" min="0" step=".01"><label>Update date</label><input id="ivUpdateDate" type="date"><label>Additional deposit / withdrawal ($)</label><input id="ivFlow" type="number" step=".01" value="0"><p class="note">Positive = money added. Negative = money withdrawn. This separates cash flows from gains or losses. For accurate history, enter the current value after the cash flow.</p><button class="action full" onclick="ivUpdate()">Save Update</button></div></div>
+<div class="panel"><h2>Asset Allocation</h2><div class="alloc-bar" id="ivAllocBar" style="height:16px"></div><div id="ivAllocLegend"></div></div>
+</div>
+<div id="ivMarkets" class="hidden"><div class="panel"><h2>Stock Market Heatmap</h2><p class="note">Visual model only · fictional percentage changes · NOT live prices.</p><div class="iv-mock" id="ivHeatmap"></div></div><div class="panel"><h2>Crypto Market</h2><p class="note">Illustrative cards, not market quotes or your personal holdings.</p><div id="ivCryptoMock"></div></div><div class="panel"><h2>Investment Explorer</h2><p>Stocks and funds, crypto, property, fixed income, and alternative assets. Use My Portfolio to record the assets you actually own.</p><div class="iv-grid" id="ivExplorer"></div></div></div>
+<div id="ivGoals" class="hidden"><div class="panel"><h2>Homeownership Planner</h2><p class="note">Purchase planning only. This does not create an owned property in your portfolio.</p><div class="iv-form"><label>Target home price ($)</label><input type="number" id="ivHomePrice" min="0" step="10000" onchange="ivSetGoal('homePrice',this.value)"><label>Down payment (%)</label><input type="number" id="ivDownPct" min="0" max="100" step="1" onchange="ivSetGoal('downPct',this.value)"><label>Closing costs estimate (%)</label><input type="number" id="ivClosingPct" min="0" max="20" step=".5" onchange="ivSetGoal('closingPct',this.value)"><label>Cash cushion after closing ($)</label><input type="number" id="ivCushion" min="0" step="1000" onchange="ivSetGoal('cushion',this.value)"><label>Additional funds available for purchase ($)</label><input type="number" id="ivAdditional" min="0" step="1000" onchange="ivSetGoal('additional',this.value)"></div><hr><div id="ivHomeResult"></div><p class="note">Home savings are read from Personal Budget, not counted again as portfolio assets. Mortgage qualification, interest, taxes, insurance, and ongoing costs are not modeled here.</p></div>
+<div class="panel"><h2>Rental Property Scenario</h2><div class="iv-form"><label>Purchase price ($)</label><input id="ivRentalPrice" type="number" min="0" step="10000" onchange="ivSetGoal('rentalPrice',this.value)"><label>Down payment (%)</label><input id="ivRentalDown" type="number" min="0" max="100" onchange="ivSetGoal('rentalDown',this.value)"><label>Interest rate (%)</label><input id="ivRentalRate" type="number" min="0" max="30" step=".1" onchange="ivSetGoal('rentalRate',this.value)"><label>Loan term (years)</label><input id="ivRentalYears" type="number" min="1" max="40" onchange="ivSetGoal('rentalYears',this.value)"><label>Expected monthly rent ($)</label><input id="ivRentalRent" type="number" min="0" step="50" onchange="ivSetGoal('rentalRent',this.value)"><label>Monthly taxes, insurance, HOA, maintenance and management ($)</label><input id="ivRentalCosts" type="number" min="0" step="25" onchange="ivSetGoal('rentalCosts',this.value)"><label>Vacancy allowance (%)</label><input id="ivRentalVacancy" type="number" min="0" max="100" step="1" onchange="ivSetGoal('rentalVacancy',this.value)"></div><hr><div id="ivRentalResult"></div><p class="note">Illustrative cash-flow model only. Excludes purchase closing costs, income taxes, capital improvements, and unusual repairs. Negative cash flow is possible.</p></div></div>
+<p class="note">Portfolio entries and scenarios are saved on this device in browser storage. Export or back up your data before changing browsers or clearing website data. The public GitHub repository contains only the app code, not your locally entered values.</p>
+</section>
 <footer>Saved automatically on this device when opened in a browser that supports local storage. Local file previews may show the numbers but disable interactivity. For reliable iPhone Home Screen use, publish this file to an HTTPS static host and open it in Safari.</footer>
 <script>
 const personalTiers=[[85000,40],[105000,42],[130000,45],[150000,50],[170000,53],[190000,56],[215000,58],[230000,60],[250000,62],[300000,64],[340000,66],[385000,68],[425000,70],[552500,75],[850000,80]];
@@ -260,7 +294,7 @@ const $=id=>document.getElementById(id), money=n=>'$'+Math.round(n).toLocaleStri
 const getTier=n=>{let p=40;for(const [min,pct] of personalTiers)if(n>=min)p=pct;return p};
 const getMgr=n=>{let found=null;for(const [min,pct,name] of managerTiers)if(n>=min)found={min,pct,name};return found};
 function save(){try{localStorage.setItem('financeSales2027',JSON.stringify(s))}catch(e){}}
-function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');$('budget').classList.toggle('hidden',which!=='budget');$('business').classList.toggle('hidden',which!=='business');window.scrollTo(0,0);location.hash=which==='home'?'':which}
+function show(which){$('home').classList.toggle('hidden',which!=='home');$('sales').classList.toggle('hidden',which!=='sales');$('budget').classList.toggle('hidden',which!=='budget');$('business').classList.toggle('hidden',which!=='business');$('investments').classList.toggle('hidden',which!=='investments');if(which==='investments')ivRender();window.scrollTo(0,0);location.hash=which==='home'?'':which}
 function coming(name){alert(name+' is planned for a future update. Sales & Income is ready now.')}
 function sliderMarkup(id,label,min,max,step,value){return `<div class="item"><div class="item-head"><label for="${id}">${label}</label><span class="value" id="${id}Val">${money(value)}</span></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="sliderChange('${id}',this.value)"></div>`}
 function drawSliders(){
@@ -487,4 +521,55 @@ $('beCategory').innerHTML=beCategories.map(([name])=>`<option>${name}</option>`)
 $('beFilter').innerHTML='<option value="">All categories</option>'+beCategories.map(([name])=>`<option>${name}</option>`).join('');
 $('beYear').innerHTML=[2026,2027,2028,2029,2030].map(y=>`<option value="${y}" ${y===new Date().getFullYear()?'selected':''}>${y}</option>`).join('');
 beRender();
+
+/* V7 investment ledger: manual valuations and net cash flow adjustments */
+const ivKey='financeInvestmentsV1';
+const ivCats=['Stocks & ETFs','Cryptocurrency','Real Estate','Fixed Income','Alternative Assets'];
+const ivColors={'Stocks & ETFs':'#527f65','Cryptocurrency':'#79649b','Real Estate':'#9b8a55','Fixed Income':'#5c7d9e','Alternative Assets':'#976d78'};
+let iv;try{iv=JSON.parse(localStorage.getItem(ivKey)||'null')}catch(e){}
+if(!iv||!Array.isArray(iv.assets))iv={assets:[],goals:{}};
+iv.goals??={};
+const ivDefaults={homePrice:1100000,downPct:20,closingPct:3,cushion:40000,additional:0,rentalPrice:300000,rentalDown:25,rentalRate:7,rentalYears:30,rentalRent:2100,rentalCosts:650,rentalVacancy:5};
+for(const [k,v] of Object.entries(ivDefaults))if(iv.goals[k]===undefined)iv.goals[k]=v;
+const ivToday=()=>new Date().toLocaleDateString('en-CA');
+const ivUid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+let ivSelected=null;
+function ivSave(){try{localStorage.setItem(ivKey,JSON.stringify(iv))}catch(e){alert('Storage is full or unavailable. Back up your data.')}}
+function ivTab(name){for(const n of ['Portfolio','Markets','Goals']){$('iv'+n).classList.toggle('hidden',n!==name);$('ivTab'+n).classList.toggle('active',n===name)}if(name==='Goals')ivRenderGoals()}
+function ivOpenAdd(category=''){$('ivEntryPanel').classList.remove('hidden');$('ivAddForm').classList.remove('hidden');$('ivUpdateForm').classList.add('hidden');$('ivEntryTitle').textContent='Add Investment';$('ivName').value='';$('ivCategory').value=ivCats.includes(category)?category:ivCats[0];$('ivValue').value='';$('ivDate').value=ivToday();$('ivEntryPanel').scrollIntoView({behavior:'smooth',block:'start'})}
+function ivOpenUpdate(id){const a=iv.assets.find(x=>x.id===id);if(!a)return;ivSelected=id;$('ivEntryPanel').classList.remove('hidden');$('ivAddForm').classList.add('hidden');$('ivUpdateForm').classList.remove('hidden');$('ivEntryTitle').textContent='Update Investment';$('ivUpdatingLabel').textContent=a.name+' · Last value '+money(a.value);$('ivNewValue').value=a.value;$('ivUpdateDate').value=ivToday();$('ivFlow').value=0;$('ivEntryPanel').scrollIntoView({behavior:'smooth',block:'start'})}
+function ivClose(){$('ivEntryPanel').classList.add('hidden');ivSelected=null}
+function ivAdd(){const name=$('ivName').value.trim(),value=+$('ivValue').value,date=$('ivDate').value;if(!name||!date||!Number.isFinite(value)||value<0||$('ivValue').value===''){alert('Enter a name, date and nonnegative value.');return}iv.assets.push({id:ivUid(),name,category:$('ivCategory').value,start:value,value,flows:0,history:[{date,value,flow:0}]});ivSave();ivClose();ivRender()}
+function ivUpdate(){const a=iv.assets.find(x=>x.id===ivSelected);if(!a)return;const value=+$('ivNewValue').value,flow=+$('ivFlow').value,date=$('ivUpdateDate').value;if(!date||$('ivNewValue').value===''||!Number.isFinite(value)||value<0||!Number.isFinite(flow)||value<0){alert('Enter a valid value, date and cash flow.');return}const last=a.history[a.history.length-1];if(date<last.date){alert('Update date must be on or after the last recorded valuation.');return}a.value=value;a.flows+=flow;a.history.push({date,value,flow});ivSave();ivClose();ivRender()}
+function ivRemove(id){if(!confirm('Delete this investment and its history?'))return;iv.assets=iv.assets.filter(a=>a.id!==id);ivSave();ivRender()}
+function ivRender(){
+const total=iv.assets.reduce((s,a)=>s+a.value,0),baseline=iv.assets.reduce((s,a)=>s+a.start+a.flows,0),change=total-baseline;
+$('ivTotal').textContent=money(total);$('ivChange').textContent=(change>=0?'+':'−')+money(Math.abs(change));$('ivChange').className='metric-value '+(change>=0?'iv-positive':'iv-negative');$('ivPercent').textContent=baseline>0?(change/baseline*100).toFixed(2)+'% vs initial values + net cash flows':'Excludes contributions and withdrawals';$('ivAssetCount').textContent=iv.assets.length+' assets';
+$('ivHoldings').innerHTML=iv.assets.length?iv.assets.map(a=>{const gain=a.value-a.start-a.flows;return `<div class="iv-row"><div style="flex:1;min-width:0"><strong>${safe(a.name)}</strong><small>${safe(a.category)} · ${a.history.length} valuations</small><small class="${gain>=0?'iv-positive':'iv-negative'}">${gain>=0?'+':'−'}${money(Math.abs(gain))} since tracking (adjusted for cash flows)</small></div><div style="text-align:right"><strong>${money(a.value)}</strong><div><button class="ghost" onclick="ivOpenUpdate('${a.id}')">Update</button><button class="ghost" onclick="ivRemove('${a.id}')">✕</button></div></div></div>`}).join(''):'<p class="note">No investments yet. Add an investment using its current value to start tracking.</p>';
+const totals=Object.fromEntries(ivCats.map(c=>[c,iv.assets.filter(a=>a.category===c).reduce((s,a)=>s+a.value,0)]));
+$('ivAllocBar').innerHTML=ivCats.map(c=>`<div style="width:${total?totals[c]/total*100:0}%;background:${ivColors[c]}"></div>`).join('');
+$('ivAllocLegend').innerHTML=ivCats.map(c=>`<div class="line"><span><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${ivColors[c]};margin-right:9px"></span>${c}</span><strong>${money(totals[c])}</strong></div>`).join('');
+const points=[];for(const a of iv.assets){for(const h of a.history)points.push(h.date)}
+const dates=[...new Set(points)].sort();
+let values=dates.map(d=>iv.assets.reduce((sum,a)=>{const h=a.history.filter(x=>x.date<=d).at(-1);return sum+(h?h.value:0)},0));
+const svg=$('ivChart');if(!dates.length){svg.innerHTML='<text x="170" y="92" text-anchor="middle" fill="#999" font-size="13">No history yet</text>'; $('ivChartNote').textContent='Add an investment to begin your history.'}else{
+const min=Math.min(...values,0),max=Math.max(...values,1),span=max-min||1;const coords=values.map((v,i)=>[dates.length===1?170:15+i*310/(dates.length-1),155-(v-min)/span*125]);const path=coords.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');svg.innerHTML=`<line x1="15" y1="155" x2="325" y2="155" stroke="#454545" stroke-dasharray="4 5"/><line x1="15" y1="92" x2="325" y2="92" stroke="#343434" stroke-dasharray="4 5"/><path d="${path}" fill="none" stroke="#9782bd" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${coords.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#c9b6e7"/>`).join('')}`;$('ivChartNote').textContent=`${dates[0]} → ${dates.at(-1)} · Valuations are manual snapshots, not live prices. Historical totals reflect assets added over time.`}
+}
+function ivSetGoal(key,v){const n=Number(v);if(!Number.isFinite(n)||n<0)return;iv.goals[key]=n;ivSave();ivRenderGoals()}
+function ivRenderGoals(){const g=iv.goals;for(const [id,key] of [['ivHomePrice','homePrice'],['ivDownPct','downPct'],['ivClosingPct','closingPct'],['ivCushion','cushion'],['ivAdditional','additional'],['ivRentalPrice','rentalPrice'],['ivRentalDown','rentalDown'],['ivRentalRate','rentalRate'],['ivRentalYears','rentalYears'],['ivRentalRent','rentalRent'],['ivRentalCosts','rentalCosts'],['ivRentalVacancy','rentalVacancy']])if(document.activeElement!==$(id))$(id).value=g[key];
+const saved=Math.max(0,Number(plan?.alloc?.home)||0),down=g.homePrice*g.downPct/100,closing=g.homePrice*g.closingPct/100,needed=down+closing+g.cushion,available=saved+g.additional;
+$('ivHomeResult').innerHTML=`<div class="line"><span>Down payment</span><strong>${money(down)}</strong></div><div class="line"><span>Estimated closing costs</span><strong>${money(closing)}</strong></div><div class="line"><span>Cash cushion</span><strong>${money(g.cushion)}</strong></div><div class="line"><span>Total cash target</span><strong>${money(needed)}</strong></div><div class="line"><span>Home Savings allocation</span><strong>${money(saved)}</strong></div><div class="line"><span>Other available funds (manual)</span><strong>${money(g.additional)}</strong></div><hr><div class="line"><strong>${needed>available?'Remaining to target':'Surplus over target'}</strong><strong>${money(Math.abs(needed-available))}</strong></div><div class="bar"><div style="width:${needed?Math.min(100,available/needed*100):100}%;background:#9b8a55"></div></div>`;
+const loan=g.rentalPrice*(1-g.rentalDown/100),r=g.rentalRate/1200,n=Math.max(1,g.rentalYears*12),payment=r===0?loan/n:loan*r/(1-Math.pow(1+r,-n)),effectiveRent=g.rentalRent*(1-g.rentalVacancy/100),net=effectiveRent-g.rentalCosts-payment;
+$('ivRentalResult').innerHTML=`<div class="line"><span>Down payment</span><strong>${money(g.rentalPrice*g.rentalDown/100)}</strong></div><div class="line"><span>Estimated monthly mortgage P&amp;I</span><strong>${money(payment)}</strong></div><div class="line"><span>Rent after vacancy allowance</span><strong>${money(effectiveRent)}</strong></div><div class="line"><span>Other monthly costs</span><strong>${money(g.rentalCosts)}</strong></div><hr><div class="line"><strong>Estimated monthly cash flow</strong><strong class="${net>=0?'iv-positive':'iv-negative'}">${net<0?'−':''}${money(Math.abs(net))}</strong></div>`;
+}
+const ivDescriptions={'Stocks & ETFs':'Holdings and watchlist','Cryptocurrency':'Coins and performance','Real Estate':'Homes and rentals','Fixed Income':'Bonds, CDs and Treasuries','Alternative Assets':'Collectibles and commodities','Investment Explorer':'Markets and asset classes'};
+const ivIcons={'Stocks & ETFs':'▥','Cryptocurrency':'₿','Real Estate':'⌂','Fixed Income':'▤','Alternative Assets':'◇','Investment Explorer':'◎'};
+function ivCard(c,action){return `<button class="iv-card" data-cat="${c}" onclick="${action}"><span class="iv-icon">${ivIcons[c]}</span><strong>${c}</strong><small>${ivDescriptions[c]}</small></button>`}
+$('ivAssetCards').innerHTML=[...ivCats,'Investment Explorer'].map(c=>ivCard(c,c==='Investment Explorer'?"ivTab('Markets')":c==='Real Estate'?"ivTab('Goals')":`ivOpenAdd('${c}')`)).join('');
+$('ivExplorer').innerHTML=ivCats.map(c=>ivCard(c,`ivTab('Portfolio');ivOpenAdd('${c}')`)).join('');
+$('ivCategory').innerHTML=ivCats.map(c=>`<option>${c}</option>`).join('');
+const mockStocks=[['AAPL','+2.5',1],['MSFT','+0.4',1],['NVDA','+2.0',1],['AMZN','+1.6',1],['GOOGL','-0.3',-1],['META','+1.5',1],['TSLA','+3.8',1],['JPM','+1.5',1],['V','-2.8',-1],['WMT','+0.6',1],['XOM','+0.3',1],['DIS','-0.8',-1]];
+$('ivHeatmap').innerHTML=mockStocks.map(([t,p,up])=>`<div class="iv-tile" style="background:${up?'#285c43':'#693c45'}"><strong>${t}</strong><small>${p}%</small></div>`).join('');
+$('ivCryptoMock').innerHTML=[['Bitcoin','₿','$68,500','+1.4%'],['Ethereum','Ξ','$3,250','−0.6%'],['Solana','◎','$155','+2.1%']].map(([name,symbol,price,pct])=>`<div class="iv-row"><div><strong>${symbol} ${name}</strong><small>Sample price · not live</small></div><div style="text-align:right"><strong>${price}</strong><small>${pct}</small></div></div>`).join('');
+ivRender();
 </script></body></html>
